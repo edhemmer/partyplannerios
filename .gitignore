@@ -1,0 +1,20 @@
+# Xcode
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# App secrets
+*.xcconfig
+Secrets.plist
+GoogleService-Info.plist
+
+# macOS
+.DS_Store
+
