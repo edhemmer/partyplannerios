@@ -1,0 +1,39 @@
+# Party Planner iOS
+
+A native SwiftUI foundation for a professional party and event execution planner.
+
+The app is designed around one core idea: the event owner frames the event, the app generates a deterministic operating plan, and invited helpers can update only their own responsibilities while everyone stays coordinated through updates, chat, notes, calendar, maps, notifications, supplies, meals, and expenses.
+
+## Competitive Notes
+
+Current tools tend to solve one slice well:
+
+- Partiful and invite apps make invitations, RSVPs, reminders, and event pages fun.
+- Howbout and shared calendar tools help groups coordinate time and polls.
+- The Knot and wedding tools provide large checklists and vendor workflows.
+- Todoist, Things, and TickTick handle task execution.
+- Splitwise and similar apps handle group expenses.
+- Google Calendar and Apple Calendar own the calendar layer.
+
+This app combines the missing operational layer: owner-controlled event setup, AI-assisted supply and meal quantities, assigned responsibilities, controlled expense allocation, receipts, live updates, public/private notes, guest and helper contacts, venue/directions, and execution-day accountability.
+
+## Product Pillars
+
+- Owner-controlled master plan for venue, guest count, event type, responsibilities, and expense policy.
+- Deterministic planning intelligence that proposes supplies, quantities, meals, amenities, setup, breakdown, and timeline tasks.
+- Permission-aware collaboration so helpers edit only their responsibilities, receipts, notes, and private messages.
+- Transparent expenses with event total, category totals, per-user out-of-pocket, and "your share".
+- Native integrations for EventKit calendar, MapKit directions, UserNotifications, and future CarPlay-compatible navigation handoff.
+- Beautiful SwiftUI interface with colorful section identity, clear icons, and fast operational scanning.
+
+## Source Layout
+
+- `PartyPlanner/PartyPlannerApp.swift` starts the app.
+- `PartyPlanner/Models` contains event, user, meal, supply, task, note, and expense models.
+- `PartyPlanner/Services` contains deterministic planning, expense allocation, permissions, updates, and integration adapters.
+- `PartyPlanner/Views` contains the native SwiftUI app shell and feature screens.
+- `PartyPlanner/Fixtures` contains a realistic sample event for previews and local development.
+
+## Implementation Status
+
+This repository currently contains the first native SwiftUI implementation pass. It is ready to move into an Xcode iOS app target on macOS. Local compilation was not run here because this Windows workspace does not include Xcode or the iOS SDK.
