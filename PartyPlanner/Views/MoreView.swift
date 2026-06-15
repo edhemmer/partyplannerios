@@ -4,6 +4,15 @@ struct MoreView: View {
     var body: some View {
         List {
             Section {
+                ScreenIntroBanner(
+                    title: "More event tools",
+                    detail: "Open the board, get support, and review the quality resources that keep the app production-ready.",
+                    icon: "ellipsis.circle",
+                    color: PartyTheme.violet
+                )
+            }
+
+            Section {
                 NavigationLink {
                     CommunicationView()
                 } label: {

@@ -6,6 +6,15 @@ struct CrewView: View {
     var body: some View {
         List {
             Section {
+                ScreenIntroBanner(
+                    title: "Coordinate the crew",
+                    detail: "See RSVP confidence, assigned work, helper status, contact details, party size, and dietary notes in one place.",
+                    icon: "person.3.sequence",
+                    color: PartyTheme.lagoon
+                )
+            }
+
+            Section {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     MetricTile(title: "Going", value: "\(store.rsvpSummary[.yes, default: 0])", icon: "checkmark.circle", color: .green)
                     MetricTile(title: "Maybe", value: "\(store.rsvpSummary[.maybe, default: 0])", icon: "questionmark.circle", color: .orange)

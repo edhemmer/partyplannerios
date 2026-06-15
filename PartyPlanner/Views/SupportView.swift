@@ -29,6 +29,15 @@ struct SupportView: View {
     var body: some View {
         List {
             Section {
+                ScreenIntroBanner(
+                    title: "Learn as you plan",
+                    detail: "Search definitions, how-to steps, permissions, expenses, trust signals, and event-day best practices.",
+                    icon: "graduationcap",
+                    color: PartyTheme.leaf
+                )
+            }
+
+            Section {
                 ForEach(HelpCenterContent.quickPrompts) { prompt in
                     supportPrompt(prompt)
                 }

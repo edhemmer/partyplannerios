@@ -8,6 +8,15 @@ struct CommunicationView: View {
     var body: some View {
         List {
             Section {
+                ScreenIntroBanner(
+                    title: "Keep everyone aligned",
+                    detail: "Post public updates, send private messages, and keep owner-only notes out of the main party board.",
+                    icon: "bubble.left.and.bubble.right",
+                    color: PartyTheme.ember
+                )
+            }
+
+            Section {
                 Picker("Visibility", selection: $visibility) {
                     Text("Main Board").tag(NoteVisibility.eventBoard)
                     Text("Private").tag(NoteVisibility.privateMessage)

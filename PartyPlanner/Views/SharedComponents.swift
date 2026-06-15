@@ -83,6 +83,34 @@ struct PremiumEmptyState: View {
     }
 }
 
+struct ScreenIntroBanner: View {
+    var title: String
+    var detail: String
+    var icon: String
+    var color: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: icon)
+                .font(.title3.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 44, height: 44)
+                .background(color.gradient, in: RoundedRectangle(cornerRadius: 12))
+            VStack(alignment: .leading, spacing: 5) {
+                Text(title)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(PartyTheme.ink)
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(14)
+        .premiumSurface(tint: color, prominent: true)
+    }
+}
+
 struct InsightCard: View {
     var insight: PlanningInsight
 

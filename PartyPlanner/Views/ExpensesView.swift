@@ -8,6 +8,15 @@ struct ExpensesView: View {
 
         List {
             Section {
+                ScreenIntroBanner(
+                    title: "Keep money clean",
+                    detail: "Track receipts, category totals, out-of-pocket spend, and share math without guessing later.",
+                    icon: "receipt",
+                    color: PartyTheme.ember
+                )
+            }
+
+            Section {
                 MetricTile(title: "Total Party Expense", value: summary.eventTotal.currencyText, icon: "dollarsign.circle", color: .pink)
                 LinearMeter(
                     title: "Budget Used",

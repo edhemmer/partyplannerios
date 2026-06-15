@@ -8,6 +8,15 @@ struct PlanBuilderView: View {
 
         List {
             Section {
+                ScreenIntroBanner(
+                    title: "Build the party blueprint",
+                    detail: "Frame the event, generate the master plan, then tune supplies, timing, headcount, and budget before people arrive.",
+                    icon: "wand.and.stars",
+                    color: PartyTheme.violet
+                )
+            }
+
+            Section {
                 Picker("Preset", selection: $store.event.preset) {
                     ForEach(EventPreset.allCases) { preset in
                         Text(preset.rawValue).tag(preset)
