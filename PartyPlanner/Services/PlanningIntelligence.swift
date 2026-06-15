@@ -63,4 +63,51 @@ enum PlanningIntelligence {
 
         return GeneratedPlan(questions: questions, supplies: supplies, responsibilities: responsibilities)
     }
+
+    static func generateInsights(for event: PartyEvent) -> [PlanningInsight] {
+        var insights: [PlanningInsight] = []
+        let unassignedSupplies = event.supplies.filter { $0.assignedUserID == nil }
+        let blockedResponsibilities = event.responsibilities.filter { $0.status == .blocked }
+        let unownedMealCount = event.meals.filter { meal in
+            event.users.contains(where: { $0.id == meal.ownerID }) == false
+        }.count
+        let hasBarPlan = event.supplies.contains { $0.category == .bar } || event.responsibilities.contains { $0.kind == .bar }
+        let hasBreakdownCrew = event.responsibilities.contains { $0.kind == .breakdown }
+        let totalEstimatedMeals = event.meals.reduce(Decimal(0)) { $0 + $1.estimatedCost }
+        let totalExpenses = event.expenses.reduce(Decimal(0)) { $0 + $1.amount }
+
+        if event.guestCount > 0 && event.supplies.isEmpty {
+            insights.append(PlanningInsight(severity: .urgent, title: "No supply plan yet", detail: "Generate the master plan before inviting helpers so quantities are clear."))
+        }
+
+        if !unassignedSupplies.isEmpty {
+            insights.append(PlanningInsight(severity: .attention, title: "\(unassignedSupplies.count) supply items unassigned", detail: "Assign owners for items that must be bought, packed, or staged."))
+        }
+
+        if !blockedResponsibilities.isEmpty {
+            insights.append(PlanningInsight(severity: .urgent, title: "\(blockedResponsibilities.count) blocked responsibilities", detail: "Review blockers before the event timeline gets compressed."))
+        }
+
+        if unownedMealCount > 0 {
+            insights.append(PlanningInsight(severity: .urgent, title: "Meal owner missing", detail: "Every meal needs one accountable person for ingredients, equipment, and timing."))
+        }
+
+        if !hasBarPlan {
+            insights.append(PlanningInsight(severity: .attention, title: "Beverage plan not assigned", detail: "Add soft drinks, water, ice, alcohol rules, coolers, and serving supplies."))
+        }
+
+        if !hasBreakdownCrew {
+            insights.append(PlanningInsight(severity: .attention, title: "Breakdown crew missing", detail: "Assign cleanup, trash, leftovers, rental returns, and venue reset tasks."))
+        }
+
+        if totalExpenses == 0 && totalEstimatedMeals > 0 {
+            insights.append(PlanningInsight(severity: .info, title: "Expense tracking ready", detail: "Meal estimates exist. Add receipts as users start buying supplies."))
+        }
+
+        if insights.isEmpty {
+            insights.append(PlanningInsight(severity: .info, title: "Plan is healthy", detail: "The event has owners, supplies, responsibilities, and expense tracking in motion."))
+        }
+
+        return insights
+    }
 }

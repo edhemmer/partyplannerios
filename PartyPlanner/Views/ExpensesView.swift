@@ -4,7 +4,7 @@ struct ExpensesView: View {
     @Environment(EventStore.self) private var store
 
     var body: some View {
-        let summary = ExpenseAllocator.summarize(event: store.event)
+        let summary = store.expenseSummary
 
         List {
             Section {
@@ -62,7 +62,7 @@ struct ExpensesView: View {
                             Spacer()
                             Text(expense.amount.currencyText)
                         }
-                        Text("\(expense.category.rawValue) • paid by \(store.event.userName(for: expense.paidByUserID)) • \(expense.splitPolicy.rawValue)")
+                        Text("\(expense.category.rawValue) - paid by \(store.event.userName(for: expense.paidByUserID)) - \(expense.splitPolicy.rawValue)")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

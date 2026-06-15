@@ -3,7 +3,7 @@ import SwiftUI
 enum AppTab: String, CaseIterable, Identifiable {
     case command = "Command"
     case plan = "Plan"
-    case duties = "Duties"
+    case crew = "Crew"
     case money = "Money"
     case board = "Board"
 
@@ -13,7 +13,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .command: "party.popper"
         case .plan: "wand.and.stars"
-        case .duties: "checklist"
+        case .crew: "person.3.sequence"
         case .money: "receipt"
         case .board: "bubble.left.and.bubble.right"
         }
@@ -43,8 +43,8 @@ struct AppRootView: View {
             DashboardView()
         case .plan:
             PlanBuilderView()
-        case .duties:
-            ResponsibilityBoardView()
+        case .crew:
+            CrewView()
         case .money:
             ExpensesView()
         case .board:

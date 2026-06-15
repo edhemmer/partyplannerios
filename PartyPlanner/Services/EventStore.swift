@@ -22,6 +22,37 @@ final class EventStore {
         currentUser.role == .owner || currentUser.role == .cohost
     }
 
+    var expenseSummary: ExpenseSummary {
+        ExpenseAllocator.summarize(event: event)
+    }
+
+    var nextResponsibilities: [Responsibility] {
+        event.responsibilities
+            .filter { $0.status != .done }
+            .sorted { $0.dueDate < $1.dueDate }
+    }
+
+    var myResponsibilities: [Responsibility] {
+        event.responsibilities
+            .filter { $0.ownerID == currentUserID }
+            .sorted { $0.dueDate < $1.dueDate }
+    }
+
+    var planningInsights: [PlanningInsight] {
+        PlanningIntelligence.generateInsights(for: event)
+    }
+
+    var readinessScore: Int {
+        let total = max(event.responsibilities.count + event.supplies.count + event.meals.count, 1)
+        let completedResponsibilities = event.responsibilities.filter { $0.status == .done || $0.status == .ready }.count
+        let packedSupplies = event.supplies.filter(\.isPacked).count
+        let ownedMeals = event.meals.filter { meal in
+            event.users.contains { $0.id == meal.ownerID }
+        }.count
+        let raw = Double(completedResponsibilities + packedSupplies + ownedMeals) / Double(total)
+        return min(100, max(0, Int((raw * 100).rounded())))
+    }
+
     func regenerateSuggestedPlan() {
         guard canEditMasterPlan else { return }
         let plan = PlanningIntelligence.generatePlan(for: event)

@@ -93,6 +93,43 @@ enum NoteVisibility: String, CaseIterable, Codable {
     case ownerOnly
 }
 
+enum InsightSeverity: String, Codable {
+    case info
+    case attention
+    case urgent
+
+    var title: String {
+        switch self {
+        case .info: "Good"
+        case .attention: "Needs Review"
+        case .urgent: "Act Now"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .info: "checkmark.seal"
+        case .attention: "exclamationmark.triangle"
+        case .urgent: "bolt.badge.clock"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .info: .green
+        case .attention: .orange
+        case .urgent: .red
+        }
+    }
+}
+
+struct PlanningInsight: Identifiable, Hashable {
+    var id = UUID()
+    var severity: InsightSeverity
+    var title: String
+    var detail: String
+}
+
 struct PartyUser: Identifiable, Hashable, Codable {
     var id = UUID()
     var name: String

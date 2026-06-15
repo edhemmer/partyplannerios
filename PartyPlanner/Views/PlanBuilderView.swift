@@ -26,7 +26,7 @@ struct PlanBuilderView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(question.prompt)
                             .font(.subheadline.weight(.semibold))
-                        Text(question.options.joined(separator: " • "))
+                        Text(question.options.joined(separator: ", "))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -42,13 +42,21 @@ struct PlanBuilderView: View {
             }
 
             Section {
+                ForEach(store.planningInsights) { insight in
+                    InsightCard(insight: insight)
+                }
+            } header: {
+                Label("Plan Review", systemImage: "checklist.checked")
+            }
+
+            Section {
                 ForEach(store.event.supplies) { item in
                     HStack {
                         Image(systemName: item.category.icon)
                             .foregroundStyle(item.category.color)
                         VStack(alignment: .leading) {
                             Text(item.name)
-                            Text("\(item.quantity.formatted()) \(item.unit) • \(item.category.rawValue)")
+                            Text("\(item.quantity.formatted()) \(item.unit) - \(item.category.rawValue)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

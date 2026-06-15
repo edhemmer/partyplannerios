@@ -26,6 +26,18 @@ This app combines the missing operational layer: owner-controlled event setup, A
 - Native integrations for EventKit calendar, MapKit directions, UserNotifications, and future CarPlay-compatible navigation handoff.
 - Beautiful SwiftUI interface with colorful section identity, clear icons, and fast operational scanning.
 
+## Mobile Flow
+
+The app is intentionally organized around how a host uses it on a phone:
+
+1. `Command`: readiness score, priority work, venue, live updates, and planning intelligence.
+2. `Plan`: event setup, AI-style questions, generated supplies, and plan review.
+3. `Crew`: user contacts, roles, assigned responsibilities, and helper-owned checklists.
+4. `Money`: receipts, totals, category summaries, and share math.
+5. `Board`: public event notes, private messages, and owner-only coordination.
+
+The goal is not to make users browse data. The app should always answer: what matters now, who owns it, what is missing, and what changed.
+
 ## Source Layout
 
 - `PartyPlanner/PartyPlannerApp.swift` starts the app.
