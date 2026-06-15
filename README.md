@@ -48,6 +48,7 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `Permission-Aware Crew Work`: helpers update their assigned pieces without taking over the master plan.
 - `Operational Intelligence`: the app flags missing owners, missing supplies, blocked work, missing receipts, and weak party sections.
 - `Built-In Training`: searchable support explains roles, responsibilities, expenses, privacy, and event-day workflows.
+- `Live Trust`: realtime sync, trust score, reliability signals, and audit history show whether the plan is current and accountable.
 
 ## Source Layout
 
@@ -56,6 +57,7 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `PartyPlanner/Services` contains deterministic planning, expense allocation, permissions, updates, and integration adapters.
 - `PartyPlanner/Views` contains the native SwiftUI app shell and feature screens.
 - `docs/HELP_SUPPORT_STRATEGY.md` defines the help and training direction.
+- `docs/COMPETITOR_REVIEW.md` captures market gaps and product differentiation.
 - `PartyPlanner/Fixtures` contains a realistic sample event for previews and local development.
 
 ## Implementation Status

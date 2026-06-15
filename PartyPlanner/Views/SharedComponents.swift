@@ -142,6 +142,56 @@ struct LinearMeter: View {
     }
 }
 
+struct ReliabilitySignalCard: View {
+    var signal: ReliabilitySignal
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: signal.state.icon)
+                .font(.headline)
+                .foregroundStyle(signal.state.color)
+                .frame(width: 34, height: 34)
+                .background(signal.state.color.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(signal.title)
+                    .font(.subheadline.weight(.semibold))
+                Text(signal.detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+            StatusPill(text: signal.state.rawValue, color: signal.state.color)
+        }
+        .padding(12)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+struct AuditEventRow: View {
+    var event: AuditEvent
+    var actorName: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack {
+                Text(event.action.rawValue)
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Text(event.createdAt, style: .time)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Text("\(actorName) - \(event.target)")
+                .font(.caption.weight(.medium))
+            Text(event.detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(12)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
 struct StatusPill: View {
     var text: String
     var color: Color

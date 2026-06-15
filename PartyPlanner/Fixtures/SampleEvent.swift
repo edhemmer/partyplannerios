@@ -27,6 +27,8 @@ extension PartyEvent {
             ],
             budget: PartyBudget(targetTotal: 1800, mealsTarget: 650, barTarget: 350, activitiesTarget: 150, venueTarget: 500, suppliesTarget: 150),
             timeline: [],
+            syncStatus: SyncStatus(state: .live, lastSyncedAt: .now, pendingUploads: 0, pendingChanges: 0, conflictCount: 0),
+            auditTrail: [],
             meals: [],
             supplies: [],
             responsibilities: [],
@@ -72,6 +74,12 @@ extension PartyEvent {
 
         event.updates = [
             EventUpdate(actorID: owner.id, message: "Maya created the master party plan.", createdAt: .now)
+        ]
+
+        event.auditTrail = [
+            AuditEvent(actorID: owner.id, action: .createdPlan, target: "Summer 40th Birthday Weekend", detail: "Created event frame, budget, timeline, and sample responsibilities.", createdAt: .now),
+            AuditEvent(actorID: chef.id, action: .updatedResponsibility, target: "Grill dinner and sides", detail: "Confirmed grill tools and thermometer.", createdAt: .now),
+            AuditEvent(actorID: owner.id, action: .synced, target: "Event Data", detail: "Realtime event data is current.", createdAt: .now)
         ]
 
         return event

@@ -8,6 +8,8 @@ create type public.expense_category as enum ('meals', 'activities', 'lodging_ven
 create type public.split_policy as enum ('equal', 'adults_only', 'assigned_users', 'owner_pays');
 create type public.note_visibility as enum ('event_board', 'private_message', 'owner_only');
 create type public.rsvp_status as enum ('invited', 'yes', 'maybe', 'no', 'no_response');
+create type public.sync_connection_state as enum ('live', 'syncing', 'offline', 'degraded');
+create type public.audit_action as enum ('created_plan', 'regenerated_plan', 'updated_responsibility', 'added_expense', 'posted_note', 'resolved_conflict', 'synced');
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -87,6 +89,26 @@ create table public.timeline_moments (
   notes text not null default '',
   is_critical boolean not null default false,
   position integer not null default 0
+);
+
+create table public.event_sync_status (
+  event_id uuid primary key references public.events(id) on delete cascade,
+  state public.sync_connection_state not null default 'syncing',
+  last_synced_at timestamptz not null default now(),
+  pending_uploads integer not null default 0 check (pending_uploads >= 0),
+  pending_changes integer not null default 0 check (pending_changes >= 0),
+  conflict_count integer not null default 0 check (conflict_count >= 0),
+  updated_at timestamptz not null default now()
+);
+
+create table public.audit_events (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  actor_id uuid not null references public.profiles(id) on delete restrict,
+  action public.audit_action not null,
+  target text not null,
+  detail text not null,
+  created_at timestamptz not null default now()
 );
 
 create table public.responsibilities (
@@ -239,6 +261,8 @@ create index guest_invitations_event_id_idx on public.guest_invitations(event_id
 create index guest_invitations_profile_id_idx on public.guest_invitations(profile_id);
 create index timeline_moments_event_id_starts_at_idx on public.timeline_moments(event_id, starts_at);
 create index timeline_moments_owner_id_idx on public.timeline_moments(owner_id);
+create index audit_events_event_id_created_at_idx on public.audit_events(event_id, created_at desc);
+create index audit_events_actor_id_idx on public.audit_events(actor_id);
 create index responsibilities_event_id_idx on public.responsibilities(event_id);
 create index responsibilities_owner_id_idx on public.responsibilities(owner_id);
 create index checklist_items_responsibility_id_idx on public.checklist_items(responsibility_id);
@@ -262,6 +286,8 @@ alter table public.venues enable row level security;
 alter table public.event_budgets enable row level security;
 alter table public.guest_invitations enable row level security;
 alter table public.timeline_moments enable row level security;
+alter table public.event_sync_status enable row level security;
+alter table public.audit_events enable row level security;
 alter table public.responsibilities enable row level security;
 alter table public.checklist_items enable row level security;
 alter table public.meals enable row level security;
@@ -363,6 +389,23 @@ create policy timeline_moments_write_managers on public.timeline_moments
   for all
   using ((select public.can_manage_event(event_id)))
   with check ((select public.can_manage_event(event_id)));
+
+create policy event_sync_status_select_members on public.event_sync_status
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy event_sync_status_write_managers on public.event_sync_status
+  for all
+  using ((select public.can_manage_event(event_id)))
+  with check ((select public.can_manage_event(event_id)));
+
+create policy audit_events_select_members on public.audit_events
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy audit_events_insert_members on public.audit_events
+  for insert
+  with check ((select public.is_event_member(event_id)) and actor_id = (select auth.uid()));
 
 create policy responsibilities_select_members on public.responsibilities
   for select

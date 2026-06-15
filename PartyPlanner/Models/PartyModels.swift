@@ -131,6 +131,63 @@ enum SmartActionKind: String, Codable {
     }
 }
 
+enum SyncConnectionState: String, Codable {
+    case live = "Live"
+    case syncing = "Syncing"
+    case offline = "Offline"
+    case degraded = "Needs Attention"
+
+    var icon: String {
+        switch self {
+        case .live: "checkmark.icloud"
+        case .syncing: "arrow.triangle.2.circlepath.icloud"
+        case .offline: "icloud.slash"
+        case .degraded: "exclamationmark.icloud"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .live: .green
+        case .syncing: .blue
+        case .offline: .gray
+        case .degraded: .orange
+        }
+    }
+}
+
+enum ReliabilityState: String, Codable {
+    case verified = "Verified"
+    case review = "Review"
+    case warning = "Warning"
+
+    var icon: String {
+        switch self {
+        case .verified: "checkmark.seal"
+        case .review: "questionmark.diamond"
+        case .warning: "exclamationmark.triangle"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .verified: .green
+        case .review: .orange
+        case .warning: .red
+        }
+    }
+}
+
+enum AuditAction: String, Codable {
+    case createdPlan = "Created Plan"
+    case regeneratedPlan = "Regenerated Plan"
+    case updatedResponsibility = "Updated Responsibility"
+    case addedExpense = "Added Expense"
+    case postedNote = "Posted Note"
+    case resolvedConflict = "Resolved Conflict"
+    case synced = "Synced"
+}
+
 enum NoteVisibility: String, CaseIterable, Codable {
     case eventBoard
     case privateMessage
@@ -180,6 +237,30 @@ struct SmartAction: Identifiable, Hashable {
     var title: String
     var detail: String
     var priority: Int
+}
+
+struct SyncStatus: Hashable, Codable {
+    var state: SyncConnectionState
+    var lastSyncedAt: Date
+    var pendingUploads: Int
+    var pendingChanges: Int
+    var conflictCount: Int
+}
+
+struct AuditEvent: Identifiable, Hashable, Codable {
+    var id = UUID()
+    var actorID: PartyUser.ID
+    var action: AuditAction
+    var target: String
+    var detail: String
+    var createdAt: Date
+}
+
+struct ReliabilitySignal: Identifiable, Hashable {
+    var id = UUID()
+    var state: ReliabilityState
+    var title: String
+    var detail: String
 }
 
 struct PartyUser: Identifiable, Hashable, Codable {
@@ -317,6 +398,8 @@ struct PartyEvent: Identifiable, Hashable, Codable {
     var invitations: [GuestInvitation]
     var budget: PartyBudget
     var timeline: [TimelineMoment]
+    var syncStatus: SyncStatus
+    var auditTrail: [AuditEvent]
     var meals: [MealPlan]
     var supplies: [SupplyItem]
     var responsibilities: [Responsibility]

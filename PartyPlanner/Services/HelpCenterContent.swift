@@ -18,7 +18,11 @@ enum HelpCenterContent {
         HelpTerm(name: "Supply Item", definition: "A thing that must be bought, brought, packed, staged, or confirmed.", example: "Cups, ice, serving utensils, chairs, trash bags."),
         HelpTerm(name: "RSVP Confidence", definition: "A planning view of who is going, maybe going, not going, or has not responded.", example: "The host can plan for 34 confirmed guests and follow up with 8 unknowns."),
         HelpTerm(name: "Budget Health", definition: "The comparison between actual expenses and the event budget target.", example: "The app shows $635 spent against an $1,800 target."),
-        HelpTerm(name: "Split Policy", definition: "The rule that decides who shares an expense.", example: "Adults only, equal split, assigned users, or owner pays.")
+        HelpTerm(name: "Split Policy", definition: "The rule that decides who shares an expense.", example: "Adults only, equal split, assigned users, or owner pays."),
+        HelpTerm(name: "Trust Score", definition: "A quick signal for whether the event data is synced, complete, conflict-free, and backed by evidence.", example: "A 92% trust score means the plan is current and has no major data gaps."),
+        HelpTerm(name: "Audit Trail", definition: "A history of important changes made to the event plan.", example: "Maya regenerated the plan, Andre updated dinner, Nina added a bar receipt."),
+        HelpTerm(name: "Realtime Sync", definition: "The live connection that keeps event changes available to everyone.", example: "When a helper marks bar supplies ready, the owner sees it without refreshing."),
+        HelpTerm(name: "Conflict", definition: "A situation where two edits need review before the app can decide which version is official.", example: "Two people edit the same meal quantity while one device is offline.")
     ]
 
     static let topics: [HelpTopic] = [
@@ -99,6 +103,19 @@ enum HelpCenterContent {
                 "Post a Board update after major changes."
             ],
             relatedTerms: ["Next Best Actions", "Readiness Score", "RSVP Confidence"]
+        ),
+        HelpTopic(
+            category: .troubleshooting,
+            title: "Trust the live plan",
+            summary: "Use Live Trust to verify that the event data is fresh, synced, and backed by receipts or assignments.",
+            steps: [
+                "Open Command.",
+                "Review Live Trust and the trust score.",
+                "Check whether realtime sync is Live or Needs Attention.",
+                "Resolve any conflict, missing receipt, overdue work, or unassigned supply warnings.",
+                "Review Recent Changes before making major event-day decisions."
+            ],
+            relatedTerms: ["Trust Score", "Realtime Sync", "Audit Trail", "Conflict"]
         ),
         HelpTopic(
             category: .privacy,

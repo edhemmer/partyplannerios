@@ -30,6 +30,67 @@ final class EventStore {
         PlanningIntelligence.recommendedActions(for: event)
     }
 
+    var trustScore: Int {
+        let signals = reliabilitySignals
+        guard !signals.isEmpty else { return 100 }
+        let points = signals.reduce(0) { total, signal in
+            switch signal.state {
+            case .verified: total + 100
+            case .review: total + 65
+            case .warning: total + 25
+            }
+        }
+        return points / signals.count
+    }
+
+    var reliabilitySignals: [ReliabilitySignal] {
+        var signals: [ReliabilitySignal] = []
+        let minutesSinceSync = Calendar.current.dateComponents([.minute], from: event.syncStatus.lastSyncedAt, to: .now).minute ?? 0
+        let missingReceiptCount = event.expenses.filter { $0.receiptImageName == nil }.count
+        let unassignedSupplyCount = event.supplies.filter { $0.assignedUserID == nil }.count
+        let staleResponsibilityCount = event.responsibilities.filter { responsibility in
+            responsibility.status != .done && responsibility.dueDate < .now
+        }.count
+
+        signals.append(ReliabilitySignal(
+            state: event.syncStatus.state == .live ? .verified : .warning,
+            title: "Realtime Sync",
+            detail: event.syncStatus.state == .live ? "Event data is connected and ready for live updates." : "Updates may be delayed until sync is healthy."
+        ))
+
+        signals.append(ReliabilitySignal(
+            state: minutesSinceSync < 5 ? .verified : .review,
+            title: "Fresh Data",
+            detail: "Last synced \(minutesSinceSync) minutes ago."
+        ))
+
+        signals.append(ReliabilitySignal(
+            state: event.syncStatus.conflictCount == 0 ? .verified : .warning,
+            title: "Conflicts",
+            detail: event.syncStatus.conflictCount == 0 ? "No edit conflicts detected." : "\(event.syncStatus.conflictCount) edits need owner review."
+        ))
+
+        signals.append(ReliabilitySignal(
+            state: missingReceiptCount == 0 ? .verified : .review,
+            title: "Receipt Evidence",
+            detail: missingReceiptCount == 0 ? "All expenses have receipt evidence." : "\(missingReceiptCount) expenses are missing receipt images."
+        ))
+
+        signals.append(ReliabilitySignal(
+            state: unassignedSupplyCount == 0 ? .verified : .review,
+            title: "Assignment Coverage",
+            detail: unassignedSupplyCount == 0 ? "Every supply item has an owner." : "\(unassignedSupplyCount) supply items still need owners."
+        ))
+
+        signals.append(ReliabilitySignal(
+            state: staleResponsibilityCount == 0 ? .verified : .warning,
+            title: "Due Work",
+            detail: staleResponsibilityCount == 0 ? "No overdue responsibilities." : "\(staleResponsibilityCount) responsibilities are overdue."
+        ))
+
+        return signals
+    }
+
     var nextResponsibilities: [Responsibility] {
         event.responsibilities
             .filter { $0.status != .done }
@@ -89,6 +150,7 @@ final class EventStore {
         }
         setupQuestions = plan.questions
         publishUpdate("Regenerated the master plan from event details.")
+        recordAudit(action: .regeneratedPlan, target: "Master Plan", detail: "Generated supplies, responsibilities, and timeline suggestions.")
     }
 
     func updateResponsibilityStatus(_ responsibility: Responsibility, status: WorkStatus) {
@@ -96,11 +158,13 @@ final class EventStore {
         guard let index = event.responsibilities.firstIndex(where: { $0.id == responsibility.id }) else { return }
         event.responsibilities[index].status = status
         publishUpdate("\(currentUser.name) marked \(responsibility.title) as \(status.rawValue).")
+        recordAudit(action: .updatedResponsibility, target: responsibility.title, detail: "Status changed to \(status.rawValue).")
     }
 
     func addExpense(_ expense: Expense) {
         event.expenses.append(expense)
         publishUpdate("\(currentUser.name) added an expense receipt for \(expense.title).")
+        recordAudit(action: .addedExpense, target: expense.title, detail: "Added \(expense.amount.currencyText) in \(expense.category.rawValue).")
     }
 
     func addNote(message: String, visibility: NoteVisibility, recipients: [PartyUser.ID] = []) {
@@ -111,6 +175,7 @@ final class EventStore {
         if visibility == .eventBoard {
             publishUpdate("\(currentUser.name) posted on the event board.")
         }
+        recordAudit(action: .postedNote, target: "Board", detail: visibility == .eventBoard ? "Posted a public update." : "Posted a scoped note.")
     }
 
     func canEdit(_ responsibility: Responsibility) -> Bool {
@@ -119,6 +184,14 @@ final class EventStore {
 
     private func publishUpdate(_ message: String) {
         event.updates.insert(EventUpdate(actorID: currentUserID, message: message, createdAt: .now), at: 0)
+        event.syncStatus.lastSyncedAt = .now
+    }
+
+    private func recordAudit(action: AuditAction, target: String, detail: String) {
+        event.auditTrail.insert(
+            AuditEvent(actorID: currentUserID, action: action, target: target, detail: detail, createdAt: .now),
+            at: 0
+        )
     }
 
     private func merge<T: Identifiable & Hashable>(existing: [T], suggestions: [T]) -> [T] {

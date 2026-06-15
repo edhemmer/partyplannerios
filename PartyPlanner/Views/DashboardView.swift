@@ -9,6 +9,7 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 18) {
                 hero
                 metrics
+                liveTrust
                 smartActions
                 intelligence
                 runOfShow
@@ -40,6 +41,7 @@ struct DashboardView: View {
             .font(.callout.weight(.medium))
             HStack {
                 StatusPill(text: "\(store.readinessScore)% ready", color: readinessColor)
+                StatusPill(text: "\(store.trustScore)% trusted", color: trustColor)
                 StatusPill(text: store.canEditMasterPlan ? "Organizer" : "Helper", color: .blue)
             }
         }
@@ -53,6 +55,25 @@ struct DashboardView: View {
             MetricTile(title: "Confirmed", value: "\(store.confirmedHeadcount)", icon: "person.2.badge.gearshape", color: .orange)
             MetricTile(title: "Unpacked", value: "\(store.event.supplies.filter { !$0.isPacked }.count)", icon: "cart", color: .cyan)
             MetricTile(title: "Event Total", value: store.expenseSummary.eventTotal.currencyText, icon: "receipt", color: .pink)
+        }
+    }
+
+    private var liveTrust: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Live Trust", icon: "shield.checkered", color: .green)
+            HStack(spacing: 12) {
+                MetricTile(title: "Sync", value: store.event.syncStatus.state.rawValue, icon: store.event.syncStatus.state.icon, color: store.event.syncStatus.state.color)
+                MetricTile(title: "Trust Score", value: "\(store.trustScore)%", icon: "checkmark.shield", color: trustColor)
+            }
+            ForEach(store.reliabilitySignals.prefix(3)) { signal in
+                ReliabilitySignalCard(signal: signal)
+            }
+            if !store.event.auditTrail.isEmpty {
+                SectionHeader(title: "Recent Changes", icon: "clock.arrow.circlepath", color: .blue)
+                ForEach(store.event.auditTrail.prefix(3)) { auditEvent in
+                    AuditEventRow(event: auditEvent, actorName: store.event.userName(for: auditEvent.actorID))
+                }
+            }
         }
     }
 
@@ -120,6 +141,12 @@ struct DashboardView: View {
     private var readinessColor: Color {
         if store.readinessScore >= 75 { return .green }
         if store.readinessScore >= 40 { return .orange }
+        return .red
+    }
+
+    private var trustColor: Color {
+        if store.trustScore >= 85 { return .green }
+        if store.trustScore >= 65 { return .orange }
         return .red
     }
 }

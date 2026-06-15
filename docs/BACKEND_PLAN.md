@@ -11,6 +11,7 @@ Supabase is the recommended backend for the first production version.
 - Storage buckets for receipt images and later event media.
 - Edge Functions for controlled operations such as invite creation, push notification fanout, Google Calendar sync, and AI plan generation.
 - Structured RSVP, budget, and run-of-show tables so planning intelligence can reason about headcount, timing, and spend.
+- Audit and sync-status tables so realtime trust, change history, and conflict review are part of the data model.
 
 ## Setup Order
 
@@ -20,7 +21,7 @@ Supabase is the recommended backend for the first production version.
 4. Enable email auth first; add Sign in with Apple and Google later.
 5. Add the iOS Supabase Swift SDK in Xcode using Swift Package Manager.
 6. Store the Supabase URL and anon key in an app configuration file, not hard-coded in views.
-7. Turn on Realtime only for the tables the app needs live: `event_updates`, `notes`, `responsibilities`, `expenses`, `supply_items`, `guest_invitations`, and `timeline_moments`.
+7. Turn on Realtime only for the tables the app needs live: `event_updates`, `notes`, `responsibilities`, `expenses`, `supply_items`, `guest_invitations`, `timeline_moments`, `event_sync_status`, and `audit_events`.
 
 ## Recommended Edge Functions
 
@@ -48,3 +49,6 @@ Supabase is the recommended backend for the first production version.
 - Guests can see event details and public board content but cannot edit master planning data.
 - Guests can update their own RSVP details, party size, and dietary notes.
 - Owners/cohosts control event budget targets and the official run-of-show timeline.
+- Event members can read the audit trail for events they belong to.
+- Event members can create audit entries for their own changes.
+- Owners/cohosts can resolve conflicts and manage official sync status.
