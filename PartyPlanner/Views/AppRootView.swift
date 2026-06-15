@@ -6,6 +6,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     case crew = "Crew"
     case money = "Money"
     case board = "Board"
+    case support = "Support"
 
     var id: String { rawValue }
 
@@ -16,6 +17,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .crew: "person.3.sequence"
         case .money: "receipt"
         case .board: "bubble.left.and.bubble.right"
+        case .support: "questionmark.circle"
         }
     }
 }
@@ -49,6 +51,8 @@ struct AppRootView: View {
             ExpensesView()
         case .board:
             CommunicationView()
+        case .support:
+            SupportView()
         }
     }
 }

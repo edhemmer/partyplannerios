@@ -35,6 +35,7 @@ The app is intentionally organized around how a host uses it on a phone:
 3. `Crew`: user contacts, roles, assigned responsibilities, and helper-owned checklists.
 4. `Money`: receipts, totals, category summaries, and share math.
 5. `Board`: public event notes, private messages, and owner-only coordination.
+6. `Support`: training, definitions, how-to guides, troubleshooting, and best practices.
 
 The goal is not to make users browse data. The app should always answer: what matters now, who owns it, what is missing, and what changed.
 
@@ -46,6 +47,7 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `Budget Health`: expenses are compared against category and event targets.
 - `Permission-Aware Crew Work`: helpers update their assigned pieces without taking over the master plan.
 - `Operational Intelligence`: the app flags missing owners, missing supplies, blocked work, missing receipts, and weak party sections.
+- `Built-In Training`: searchable support explains roles, responsibilities, expenses, privacy, and event-day workflows.
 
 ## Source Layout
 
@@ -53,6 +55,7 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `PartyPlanner/Models` contains event, user, meal, supply, task, note, and expense models.
 - `PartyPlanner/Services` contains deterministic planning, expense allocation, permissions, updates, and integration adapters.
 - `PartyPlanner/Views` contains the native SwiftUI app shell and feature screens.
+- `docs/HELP_SUPPORT_STRATEGY.md` defines the help and training direction.
 - `PartyPlanner/Fixtures` contains a realistic sample event for previews and local development.
 
 ## Implementation Status
