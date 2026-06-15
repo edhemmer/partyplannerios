@@ -8,12 +8,12 @@ The app is designed around one core idea: the event owner frames the event, the 
 
 Current tools tend to solve one slice well:
 
-- Partiful and invite apps make invitations, RSVPs, reminders, and event pages fun.
-- Howbout and shared calendar tools help groups coordinate time and polls.
-- The Knot and wedding tools provide large checklists and vendor workflows.
-- Todoist, Things, and TickTick handle task execution.
-- Splitwise and similar apps handle group expenses.
-- Google Calendar and Apple Calendar own the calendar layer.
+- Invite apps make invitations, RSVPs, reminders, and event pages fun.
+- Shared calendar tools help groups coordinate time and polls.
+- Wedding planning tools provide large checklists and vendor workflows.
+- Task management tools handle checklist execution.
+- Shared expense tools handle group expenses.
+- Calendar platforms own the calendar layer.
 
 This app combines the missing operational layer: owner-controlled event setup, AI-assisted supply and meal quantities, assigned responsibilities, controlled expense allocation, receipts, live updates, public/private notes, guest and helper contacts, venue/directions, and execution-day accountability.
 
@@ -57,7 +57,9 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `PartyPlanner/Services` contains deterministic planning, expense allocation, permissions, updates, and integration adapters.
 - `PartyPlanner/Views` contains the native SwiftUI app shell and feature screens.
 - `docs/HELP_SUPPORT_STRATEGY.md` defines the help and training direction.
-- `docs/COMPETITOR_REVIEW.md` captures market gaps and product differentiation.
+- `docs/MARKET_REVIEW.md` captures market gaps and product differentiation without naming competitors.
+- `docs/PRODUCTION_TRUST_CORPUS.md` defines accuracy, reliability, and launch-stability expectations.
+- `docs/RELEASE_READINESS.md` defines build, data, UX, and launch gates.
 - `PartyPlanner/Fixtures` contains a realistic sample event for previews and local development.
 
 ## Implementation Status

@@ -23,7 +23,7 @@ Use the Mac for native iOS build, simulator, signing, and integrations.
 ## Packages to Add Later
 
 - Supabase Swift SDK.
-- Google Sign-In, if Google Calendar uses Google auth directly.
+- External calendar sign-in, if the app syncs with a third-party calendar provider directly.
 
 ## Native Frameworks Already Planned
 
@@ -31,4 +31,3 @@ Use the Mac for native iOS build, simulator, signing, and integrations.
 - MapKit for venue maps and directions.
 - UserNotifications for local and push notification surfaces.
 - CarPlay can be considered later, but it may require Apple entitlement approval and should be scoped to navigation/directions support rather than general event planning UI.
-

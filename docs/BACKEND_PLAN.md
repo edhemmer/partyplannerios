@@ -9,7 +9,7 @@ Supabase is the recommended backend for the first production version.
 - Row Level Security so users can only read/write what their event membership allows.
 - Realtime subscriptions for updates when someone changes a responsibility, receipt, note, or supply.
 - Storage buckets for receipt images and later event media.
-- Edge Functions for controlled operations such as invite creation, push notification fanout, Google Calendar sync, and AI plan generation.
+- Edge Functions for controlled operations such as invite creation, push notification fanout, calendar sync, and AI plan generation.
 - Structured RSVP, budget, and run-of-show tables so planning intelligence can reason about headcount, timing, and spend.
 - Audit and sync-status tables so realtime trust, change history, and conflict review are part of the data model.
 
