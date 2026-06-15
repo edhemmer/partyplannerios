@@ -20,11 +20,19 @@ struct VenueMapView: View {
                 Marker(venue.name, coordinate: venue.coordinate)
             }
             .frame(height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(alignment: .topLeading) {
+                Label("Directions Ready", systemImage: "location.fill")
+                    .font(.caption.weight(.bold))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(.thinMaterial, in: Capsule())
+                    .padding(10)
+            }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(venue.name)
-                    .font(.headline)
+                    .font(.headline.weight(.bold))
                 Text(venue.address)
                     .foregroundStyle(.secondary)
                 Label(venue.arrivalWindow, systemImage: "clock")
@@ -32,6 +40,8 @@ struct VenueMapView: View {
             }
             .font(.subheadline)
         }
+        .padding(14)
+        .premiumSurface(tint: .blue)
     }
 }
 

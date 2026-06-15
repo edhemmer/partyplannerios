@@ -6,7 +6,7 @@ Party Planner should not be considered production-ready until these gates are sa
 
 - Xcode project opens cleanly.
 - iOS simulator build succeeds.
-- SwiftUI previews render for Command, Plan, Crew, Money, Board, and Support.
+- SwiftUI previews render for Command, Plan, Crew, Money, More, Board, and Support.
 - No force unwraps in production paths.
 - No secrets in source control.
 

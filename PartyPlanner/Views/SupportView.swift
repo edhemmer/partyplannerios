@@ -70,6 +70,8 @@ struct SupportView: View {
                 Label("Best Practices", systemImage: "lightbulb")
             }
         }
+        .premiumListStyle()
+        .listSectionSpacing(14)
         .navigationTitle("Support")
         .searchable(text: $searchText, prompt: "Search help, terms, or how-to")
     }

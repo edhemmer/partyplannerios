@@ -101,6 +101,8 @@ struct PlanBuilderView: View {
                 Label("Run of Show", systemImage: "clock.badge.checkmark")
             }
         }
+        .premiumListStyle()
+        .listSectionSpacing(14)
         .navigationTitle("Plan")
     }
 }

@@ -5,8 +5,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     case plan = "Plan"
     case crew = "Crew"
     case money = "Money"
-    case board = "Board"
-    case support = "Support"
+    case more = "More"
 
     var id: String { rawValue }
 
@@ -16,8 +15,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .plan: "wand.and.stars"
         case .crew: "person.3.sequence"
         case .money: "receipt"
-        case .board: "bubble.left.and.bubble.right"
-        case .support: "questionmark.circle"
+        case .more: "ellipsis.circle"
         }
     }
 }
@@ -35,7 +33,7 @@ struct AppRootView: View {
                 .tag(tab)
             }
         }
-        .tint(.pink)
+        .tint(PartyTheme.ember)
     }
 
     @ViewBuilder
@@ -49,10 +47,8 @@ struct AppRootView: View {
             CrewView()
         case .money:
             ExpensesView()
-        case .board:
-            CommunicationView()
-        case .support:
-            SupportView()
+        case .more:
+            MoreView()
         }
     }
 }

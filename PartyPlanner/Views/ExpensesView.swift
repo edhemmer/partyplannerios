@@ -77,6 +77,8 @@ struct ExpensesView: View {
                 Label("Receipts", systemImage: "receipt")
             }
         }
+        .premiumListStyle()
+        .listSectionSpacing(14)
         .navigationTitle("Money")
     }
 }

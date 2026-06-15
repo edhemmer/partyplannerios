@@ -48,6 +48,8 @@ struct CrewView: View {
                 Label("Guest & Helper Contacts", systemImage: "person.text.rectangle")
             }
         }
+        .premiumListStyle()
+        .listSectionSpacing(14)
         .navigationTitle("Crew")
     }
 

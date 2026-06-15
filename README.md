@@ -34,8 +34,7 @@ The app is intentionally organized around how a host uses it on a phone:
 2. `Plan`: event setup, AI-style questions, generated supplies, and plan review.
 3. `Crew`: user contacts, roles, assigned responsibilities, and helper-owned checklists.
 4. `Money`: receipts, totals, category summaries, and share math.
-5. `Board`: public event notes, private messages, and owner-only coordination.
-6. `Support`: training, definitions, how-to guides, troubleshooting, and best practices.
+5. `More`: public/private board messages, support, training, definitions, and quality resources.
 
 The goal is not to make users browse data. The app should always answer: what matters now, who owns it, what is missing, and what changed.
 

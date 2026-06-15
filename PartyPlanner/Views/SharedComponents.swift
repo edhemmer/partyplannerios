@@ -9,17 +9,20 @@ struct MetricTile: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(color)
+                .font(.title3.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 34, height: 34)
+                .background(color.gradient, in: RoundedRectangle(cornerRadius: 8))
             Text(value)
                 .font(.title2.bold())
+                .foregroundStyle(PartyTheme.ink)
             Text(title)
-                .font(.caption)
+                .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .premiumSurface(tint: color)
     }
 }
 
@@ -45,7 +48,7 @@ struct InsightCard: View {
             Spacer(minLength: 0)
         }
         .padding(12)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .premiumSurface(tint: insight.severity.color)
     }
 }
 
@@ -71,7 +74,7 @@ struct SmartActionCard: View {
             Spacer(minLength: 0)
         }
         .padding(12)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .premiumSurface(tint: action.kind.color, prominent: true)
     }
 }
 
@@ -109,6 +112,8 @@ struct TimelineMomentRow: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .padding(12)
+        .premiumSurface(tint: moment.kind.color)
     }
 }
 
@@ -163,7 +168,7 @@ struct ReliabilitySignalCard: View {
             StatusPill(text: signal.state.rawValue, color: signal.state.color)
         }
         .padding(12)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .premiumSurface(tint: signal.state.color)
     }
 }
 
@@ -188,7 +193,7 @@ struct AuditEventRow: View {
                 .foregroundStyle(.secondary)
         }
         .padding(12)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .premiumSurface(tint: .blue)
     }
 }
 
@@ -201,8 +206,8 @@ struct StatusPill: View {
             .font(.caption.weight(.semibold))
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(color.opacity(0.14), in: Capsule())
-            .foregroundStyle(color)
+            .background(color.gradient, in: Capsule())
+            .foregroundStyle(.white)
     }
 }
 
@@ -214,9 +219,13 @@ struct SectionHeader: View {
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
-                .foregroundStyle(color)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(color.gradient, in: RoundedRectangle(cornerRadius: 7))
             Text(title)
                 .font(.headline)
+                .foregroundStyle(PartyTheme.ink)
             Spacer()
         }
     }

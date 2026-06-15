@@ -19,34 +19,65 @@ struct DashboardView: View {
             }
             .padding()
         }
+        .background(PartyTheme.frost)
         .navigationTitle("Party Command")
     }
 
     private var hero: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label(store.event.preset.rawValue, systemImage: "sparkles")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.pink)
-            Text(store.event.title)
-                .font(.largeTitle.bold())
-                .lineLimit(2)
-            Text("\(store.event.guestCount) guests - \(store.event.ageGroup)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-            HStack(spacing: 10) {
-                Label(store.event.venue.name, systemImage: "mappin.and.ellipse")
-                Spacer()
-                Text(store.event.startsAt, style: .date)
+        ZStack(alignment: .bottomLeading) {
+            PartyTheme.commandGradient
+            VStack(alignment: .leading, spacing: 18) {
+                HStack {
+                    Label(store.event.preset.rawValue, systemImage: "sparkles")
+                        .font(.caption.weight(.bold))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(.white.opacity(0.22), in: Capsule())
+                    Spacer()
+                    Image(systemName: "party.popper.fill")
+                        .font(.title2.weight(.bold))
+                        .symbolEffect(.bounce, options: .repeating.speed(0.28))
+                }
+                .foregroundStyle(.white)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(store.event.title)
+                        .font(.system(size: 34, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                    Text("\(store.event.guestCount) guests - \(store.event.ageGroup)")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.82))
+                }
+
+                HStack(spacing: 10) {
+                    Label(store.event.venue.name, systemImage: "mappin.and.ellipse")
+                    Spacer()
+                    Text(store.event.startsAt, style: .date)
+                }
+                .font(.callout.weight(.bold))
+                .foregroundStyle(.white)
+
+                ViewThatFits(in: .horizontal) {
+                    HStack {
+                        StatusPill(text: "\(store.readinessScore)% ready", color: readinessColor)
+                        StatusPill(text: "\(store.trustScore)% trusted", color: trustColor)
+                        StatusPill(text: store.canEditMasterPlan ? "Organizer" : "Helper", color: .blue)
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            StatusPill(text: "\(store.readinessScore)% ready", color: readinessColor)
+                            StatusPill(text: "\(store.trustScore)% trusted", color: trustColor)
+                        }
+                        StatusPill(text: store.canEditMasterPlan ? "Organizer" : "Helper", color: .blue)
+                    }
+                }
             }
-            .font(.callout.weight(.medium))
-            HStack {
-                StatusPill(text: "\(store.readinessScore)% ready", color: readinessColor)
-                StatusPill(text: "\(store.trustScore)% trusted", color: trustColor)
-                StatusPill(text: store.canEditMasterPlan ? "Organizer" : "Helper", color: .blue)
-            }
+            .padding(20)
         }
-        .padding()
-        .background(LinearGradient(colors: [.pink.opacity(0.18), .orange.opacity(0.18), .cyan.opacity(0.14)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 8))
+        .frame(minHeight: 250)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: PartyTheme.violet.opacity(0.28), radius: 24, x: 0, y: 14)
     }
 
     private var metrics: some View {

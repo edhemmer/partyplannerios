@@ -22,6 +22,8 @@ struct CommunicationView: View {
                     Label("Post", systemImage: "paperplane.fill")
                 }
                 .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .buttonStyle(.borderedProminent)
+                .tint(PartyTheme.ember)
             } header: {
                 Label("Communicate", systemImage: "bubble.left.and.bubble.right")
             }
@@ -44,11 +46,17 @@ struct CommunicationView: View {
                             .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 6)
+                    .listRowBackground(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(PartyTheme.lagoon.opacity(0.08))
+                    )
                 }
             } header: {
                 Label("Event Board", systemImage: "list.bullet.rectangle")
             }
         }
+        .premiumListStyle()
+        .listSectionSpacing(14)
         .navigationTitle("Board")
     }
 
