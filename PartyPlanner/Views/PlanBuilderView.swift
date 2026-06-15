@@ -35,7 +35,11 @@ struct PlanBuilderView: View {
                     store.regenerateSuggestedPlan()
                 } label: {
                     Label("Generate Master Plan", systemImage: "wand.and.stars")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(PartyTheme.violet)
+                .controlSize(.large)
                 .disabled(!store.canEditMasterPlan)
             } header: {
                 Label("Planning Intelligence", systemImage: "brain.head.profile")

@@ -73,6 +73,9 @@ struct ExpensesView: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+                if store.event.expenses.isEmpty {
+                    PremiumEmptyState(title: "No receipts yet", detail: "Add receipts as people start spending so total cost and shares stay accurate.", icon: "receipt", color: PartyTheme.lagoon)
+                }
             } header: {
                 Label("Receipts", systemImage: "receipt")
             }

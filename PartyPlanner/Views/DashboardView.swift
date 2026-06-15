@@ -8,6 +8,7 @@ struct DashboardView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 hero
+                CommandActionRail()
                 metrics
                 liveTrust
                 smartActions
@@ -111,8 +112,12 @@ struct DashboardView: View {
     private var smartActions: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Next Best Actions", icon: "sparkles", color: .orange)
-            ForEach(store.smartActions.prefix(3)) { action in
-                SmartActionCard(action: action)
+            if store.smartActions.isEmpty {
+                PremiumEmptyState(title: "Everything looks calm", detail: "No urgent host actions are waiting right now.", icon: "checkmark.seal.fill", color: PartyTheme.leaf)
+            } else {
+                ForEach(store.smartActions.prefix(3)) { action in
+                    SmartActionCard(action: action)
+                }
             }
         }
     }
@@ -138,19 +143,28 @@ struct DashboardView: View {
     private var priorityWork: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Priority Work", icon: "bolt", color: .blue)
-            ForEach(store.nextResponsibilities.prefix(4)) { item in
-                HStack(spacing: 12) {
-                    Image(systemName: item.kind.icon)
-                        .frame(width: 32, height: 32)
-                        .background(item.kind.color.opacity(0.16), in: RoundedRectangle(cornerRadius: 8))
-                    VStack(alignment: .leading) {
-                        Text(item.title)
-                            .font(.subheadline.weight(.semibold))
-                        Text("\(store.event.userName(for: item.ownerID)) - \(item.status.rawValue)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+            if store.nextResponsibilities.isEmpty {
+                PremiumEmptyState(title: "No open work", detail: "All responsibilities are marked done or ready.", icon: "checkmark.circle.fill", color: PartyTheme.leaf)
+            } else {
+                ForEach(store.nextResponsibilities.prefix(4)) { item in
+                    HStack(spacing: 12) {
+                        Image(systemName: item.kind.icon)
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(item.kind.color.gradient, in: RoundedRectangle(cornerRadius: 9))
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(item.title)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(PartyTheme.ink)
+                            Text("\(store.event.userName(for: item.ownerID)) - \(item.status.rawValue)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
                     }
-                    Spacer()
+                    .padding(12)
+                    .premiumSurface(tint: item.kind.color)
                 }
             }
         }
@@ -159,12 +173,17 @@ struct DashboardView: View {
     private var updates: some View {
         VStack(alignment: .leading, spacing: 12) {
             SectionHeader(title: "Live Updates", icon: "bell.badge", color: .pink)
-            ForEach(store.event.updates.prefix(4)) { update in
-                Text(update.message)
-                    .font(.subheadline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 8))
+            if store.event.updates.isEmpty {
+                PremiumEmptyState(title: "No updates yet", detail: "Board posts and responsibility changes will appear here.", icon: "bell", color: PartyTheme.ember)
+            } else {
+                ForEach(store.event.updates.prefix(4)) { update in
+                    Text(update.message)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(PartyTheme.ink)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(12)
+                        .premiumSurface(tint: .pink)
+                }
             }
         }
     }

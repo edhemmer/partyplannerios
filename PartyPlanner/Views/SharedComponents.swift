@@ -26,6 +26,63 @@ struct MetricTile: View {
     }
 }
 
+struct CommandActionRail: View {
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                railButton(title: "Invite", icon: "paperplane.fill", color: PartyTheme.ember)
+                railButton(title: "Assign", icon: "person.crop.circle.badge.plus", color: PartyTheme.violet)
+                railButton(title: "Receipt", icon: "receipt.fill", color: PartyTheme.lagoon)
+                railButton(title: "Update", icon: "megaphone.fill", color: PartyTheme.marigold)
+            }
+            .padding(.horizontal, 1)
+            .padding(.vertical, 2)
+        }
+    }
+
+    private func railButton(title: String, icon: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 44, height: 44)
+                .background(color.gradient, in: RoundedRectangle(cornerRadius: 12))
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(PartyTheme.ink)
+        }
+        .frame(width: 78)
+        .padding(.vertical, 10)
+        .premiumSurface(tint: color)
+    }
+}
+
+struct PremiumEmptyState: View {
+    var title: String
+    var detail: String
+    var icon: String
+    var color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Image(systemName: icon)
+                .font(.title3.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 40, height: 40)
+                .background(color.gradient, in: RoundedRectangle(cornerRadius: 10))
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(PartyTheme.ink)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .premiumSurface(tint: color)
+    }
+}
+
 struct InsightCard: View {
     var insight: PlanningInsight
 
