@@ -9,7 +9,9 @@ struct DashboardView: View {
             VStack(alignment: .leading, spacing: 18) {
                 hero
                 metrics
+                smartActions
                 intelligence
+                runOfShow
                 priorityWork
                 VenueMapView(venue: store.event.venue)
                 updates
@@ -48,9 +50,18 @@ struct DashboardView: View {
     private var metrics: some View {
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricTile(title: "Open Work", value: "\(store.nextResponsibilities.count)", icon: "checklist", color: .green)
-            MetricTile(title: "Meals", value: "\(store.event.meals.count)", icon: "fork.knife", color: .orange)
+            MetricTile(title: "Confirmed", value: "\(store.confirmedHeadcount)", icon: "person.2.badge.gearshape", color: .orange)
             MetricTile(title: "Unpacked", value: "\(store.event.supplies.filter { !$0.isPacked }.count)", icon: "cart", color: .cyan)
             MetricTile(title: "Event Total", value: store.expenseSummary.eventTotal.currencyText, icon: "receipt", color: .pink)
+        }
+    }
+
+    private var smartActions: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Next Best Actions", icon: "sparkles", color: .orange)
+            ForEach(store.smartActions.prefix(3)) { action in
+                SmartActionCard(action: action)
+            }
         }
     }
 
@@ -59,6 +70,15 @@ struct DashboardView: View {
             SectionHeader(title: "Intelligence", icon: "brain.head.profile", color: .purple)
             ForEach(store.planningInsights.prefix(3)) { insight in
                 InsightCard(insight: insight)
+            }
+        }
+    }
+
+    private var runOfShow: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionHeader(title: "Run of Show", icon: "clock.badge.checkmark", color: .indigo)
+            ForEach(store.sortedTimeline.prefix(4)) { moment in
+                TimelineMomentRow(moment: moment, ownerName: store.event.userName(for: moment.ownerID))
             }
         }
     }

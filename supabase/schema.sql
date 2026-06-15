@@ -7,6 +7,7 @@ create type public.work_status as enum ('not_started', 'in_progress', 'blocked',
 create type public.expense_category as enum ('meals', 'activities', 'lodging_venue', 'supplies', 'bar', 'decorations', 'music', 'transportation');
 create type public.split_policy as enum ('equal', 'adults_only', 'assigned_users', 'owner_pays');
 create type public.note_visibility as enum ('event_board', 'private_message', 'owner_only');
+create type public.rsvp_status as enum ('invited', 'yes', 'maybe', 'no', 'no_response');
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -52,6 +53,40 @@ create table public.venues (
   latitude double precision,
   longitude double precision,
   updated_at timestamptz not null default now()
+);
+
+create table public.event_budgets (
+  event_id uuid primary key references public.events(id) on delete cascade,
+  target_total numeric(12,2) not null default 0 check (target_total >= 0),
+  meals_target numeric(12,2) not null default 0 check (meals_target >= 0),
+  bar_target numeric(12,2) not null default 0 check (bar_target >= 0),
+  activities_target numeric(12,2) not null default 0 check (activities_target >= 0),
+  venue_target numeric(12,2) not null default 0 check (venue_target >= 0),
+  supplies_target numeric(12,2) not null default 0 check (supplies_target >= 0),
+  updated_at timestamptz not null default now()
+);
+
+create table public.guest_invitations (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  status public.rsvp_status not null default 'invited',
+  party_size integer not null default 1 check (party_size > 0),
+  dietary_notes text not null default '',
+  last_touched_at timestamptz not null default now(),
+  unique (event_id, profile_id)
+);
+
+create table public.timeline_moments (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  title text not null,
+  starts_at timestamptz not null,
+  owner_id uuid references public.profiles(id) on delete set null,
+  kind public.responsibility_kind not null,
+  notes text not null default '',
+  is_critical boolean not null default false,
+  position integer not null default 0
 );
 
 create table public.responsibilities (
@@ -200,6 +235,10 @@ $$;
 create index events_owner_id_idx on public.events(owner_id);
 create index event_members_profile_id_idx on public.event_members(profile_id);
 create index venues_event_id_idx on public.venues(event_id);
+create index guest_invitations_event_id_idx on public.guest_invitations(event_id);
+create index guest_invitations_profile_id_idx on public.guest_invitations(profile_id);
+create index timeline_moments_event_id_starts_at_idx on public.timeline_moments(event_id, starts_at);
+create index timeline_moments_owner_id_idx on public.timeline_moments(owner_id);
 create index responsibilities_event_id_idx on public.responsibilities(event_id);
 create index responsibilities_owner_id_idx on public.responsibilities(owner_id);
 create index checklist_items_responsibility_id_idx on public.checklist_items(responsibility_id);
@@ -220,6 +259,9 @@ alter table public.profiles enable row level security;
 alter table public.events enable row level security;
 alter table public.event_members enable row level security;
 alter table public.venues enable row level security;
+alter table public.event_budgets enable row level security;
+alter table public.guest_invitations enable row level security;
+alter table public.timeline_moments enable row level security;
 alter table public.responsibilities enable row level security;
 alter table public.checklist_items enable row level security;
 alter table public.meals enable row level security;
@@ -287,6 +329,37 @@ create policy venues_select_members on public.venues
   using ((select public.is_event_member(event_id)));
 
 create policy venues_write_managers on public.venues
+  for all
+  using ((select public.can_manage_event(event_id)))
+  with check ((select public.can_manage_event(event_id)));
+
+create policy event_budgets_select_members on public.event_budgets
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy event_budgets_write_managers on public.event_budgets
+  for all
+  using ((select public.can_manage_event(event_id)))
+  with check ((select public.can_manage_event(event_id)));
+
+create policy guest_invitations_select_members on public.guest_invitations
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy guest_invitations_insert_managers on public.guest_invitations
+  for insert
+  with check ((select public.can_manage_event(event_id)));
+
+create policy guest_invitations_update_self_or_manager on public.guest_invitations
+  for update
+  using ((select public.can_manage_event(event_id)) or profile_id = (select auth.uid()))
+  with check ((select public.can_manage_event(event_id)) or profile_id = (select auth.uid()));
+
+create policy timeline_moments_select_members on public.timeline_moments
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy timeline_moments_write_managers on public.timeline_moments
   for all
   using ((select public.can_manage_event(event_id)))
   with check ((select public.can_manage_event(event_id)));

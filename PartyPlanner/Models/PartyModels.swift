@@ -87,6 +87,50 @@ enum SplitPolicy: String, CaseIterable, Identifiable, Codable {
     var id: String { rawValue }
 }
 
+enum RSVPStatus: String, CaseIterable, Identifiable, Codable {
+    case invited = "Invited"
+    case yes = "Going"
+    case maybe = "Maybe"
+    case no = "Not Going"
+    case noResponse = "No Response"
+
+    var id: String { rawValue }
+}
+
+enum SmartActionKind: String, Codable {
+    case invite
+    case assign
+    case buy
+    case confirm
+    case collect
+    case communicate
+    case timeline
+
+    var icon: String {
+        switch self {
+        case .invite: "paperplane"
+        case .assign: "person.crop.circle.badge.plus"
+        case .buy: "cart.badge.plus"
+        case .confirm: "checkmark.seal"
+        case .collect: "receipt"
+        case .communicate: "bubble.left.and.text.bubble.right"
+        case .timeline: "clock.badge.checkmark"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .invite: .blue
+        case .assign: .purple
+        case .buy: .cyan
+        case .confirm: .green
+        case .collect: .pink
+        case .communicate: .orange
+        case .timeline: .indigo
+        }
+    }
+}
+
 enum NoteVisibility: String, CaseIterable, Codable {
     case eventBoard
     case privateMessage
@@ -130,6 +174,14 @@ struct PlanningInsight: Identifiable, Hashable {
     var detail: String
 }
 
+struct SmartAction: Identifiable, Hashable {
+    var id = UUID()
+    var kind: SmartActionKind
+    var title: String
+    var detail: String
+    var priority: Int
+}
+
 struct PartyUser: Identifiable, Hashable, Codable {
     var id = UUID()
     var name: String
@@ -137,6 +189,15 @@ struct PartyUser: Identifiable, Hashable, Codable {
     var phone: String
     var email: String
     var isAdult: Bool
+}
+
+struct GuestInvitation: Identifiable, Hashable, Codable {
+    var id = UUID()
+    var userID: PartyUser.ID
+    var status: RSVPStatus
+    var partySize: Int
+    var dietaryNotes: String
+    var lastTouchedAt: Date
 }
 
 struct Venue: Identifiable, Hashable, Codable {
@@ -147,6 +208,25 @@ struct Venue: Identifiable, Hashable, Codable {
     var parkingNotes: String
     var latitude: Double?
     var longitude: Double?
+}
+
+struct PartyBudget: Hashable, Codable {
+    var targetTotal: Decimal
+    var mealsTarget: Decimal
+    var barTarget: Decimal
+    var activitiesTarget: Decimal
+    var venueTarget: Decimal
+    var suppliesTarget: Decimal
+}
+
+struct TimelineMoment: Identifiable, Hashable, Codable {
+    var id = UUID()
+    var title: String
+    var startsAt: Date
+    var ownerID: PartyUser.ID?
+    var kind: ResponsibilityKind
+    var notes: String
+    var isCritical: Bool
 }
 
 struct MealPlan: Identifiable, Hashable, Codable {
@@ -234,6 +314,9 @@ struct PartyEvent: Identifiable, Hashable, Codable {
     var ownerID: PartyUser.ID
     var venue: Venue
     var users: [PartyUser]
+    var invitations: [GuestInvitation]
+    var budget: PartyBudget
+    var timeline: [TimelineMoment]
     var meals: [MealPlan]
     var supplies: [SupplyItem]
     var responsibilities: [Responsibility]

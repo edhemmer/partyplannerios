@@ -19,6 +19,14 @@ extension PartyEvent {
             ownerID: owner.id,
             venue: Venue(name: "Lakeview Pavilion", address: "1200 Harbor Road, Austin, TX", arrivalWindow: "Helpers 11:00 AM, guests 2:00 PM", parkingNotes: "Use the east lot and keep the dock entrance clear.", latitude: 30.2672, longitude: -97.7431),
             users: [owner, chef, bar, guest],
+            invitations: [
+                GuestInvitation(userID: owner.id, status: .yes, partySize: 2, dietaryNotes: "", lastTouchedAt: .now),
+                GuestInvitation(userID: chef.id, status: .yes, partySize: 1, dietaryNotes: "No shellfish", lastTouchedAt: .now),
+                GuestInvitation(userID: bar.id, status: .yes, partySize: 1, dietaryNotes: "", lastTouchedAt: .now),
+                GuestInvitation(userID: guest.id, status: .maybe, partySize: 3, dietaryNotes: "One vegetarian", lastTouchedAt: .now)
+            ],
+            budget: PartyBudget(targetTotal: 1800, mealsTarget: 650, barTarget: 350, activitiesTarget: 150, venueTarget: 500, suppliesTarget: 150),
+            timeline: [],
             meals: [],
             supplies: [],
             responsibilities: [],
@@ -30,6 +38,7 @@ extension PartyEvent {
 
         let plan = PlanningIntelligence.generatePlan(for: event)
         event.supplies = plan.supplies
+        event.timeline = PlanningIntelligence.generateTimeline(for: event)
         event.responsibilities = [
             Responsibility(title: "Grill dinner and sides", kind: .meal, ownerID: chef.id, dueDate: start, checklist: [
                 ChecklistItem(title: "Buy proteins and vegetables", isDone: false),

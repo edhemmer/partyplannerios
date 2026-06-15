@@ -38,6 +38,15 @@ The app is intentionally organized around how a host uses it on a phone:
 
 The goal is not to make users browse data. The app should always answer: what matters now, who owns it, what is missing, and what changed.
 
+## Differentiators
+
+- `Next Best Actions`: the host sees the highest leverage actions before anything else.
+- `RSVP Confidence`: headcount is tied to food, drinks, seats, dietary notes, and cost planning.
+- `Run of Show`: the event has an execution timeline, not just a date and a checklist.
+- `Budget Health`: expenses are compared against category and event targets.
+- `Permission-Aware Crew Work`: helpers update their assigned pieces without taking over the master plan.
+- `Operational Intelligence`: the app flags missing owners, missing supplies, blocked work, missing receipts, and weak party sections.
+
 ## Source Layout
 
 - `PartyPlanner/PartyPlannerApp.swift` starts the app.

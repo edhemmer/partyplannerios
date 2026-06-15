@@ -9,6 +9,12 @@ struct ExpensesView: View {
         List {
             Section {
                 MetricTile(title: "Total Party Expense", value: summary.eventTotal.currencyText, icon: "dollarsign.circle", color: .pink)
+                LinearMeter(
+                    title: "Budget Used",
+                    value: "\(summary.eventTotal.currencyText) of \(store.event.budget.targetTotal.currencyText)",
+                    ratio: store.budgetUsedRatio,
+                    color: store.budgetUsedRatio > 1 ? .red : .green
+                )
                 Picker("Default Split", selection: Binding(
                     get: { store.event.splitPolicy },
                     set: { if store.canEditMasterPlan { store.event.splitPolicy = $0 } }

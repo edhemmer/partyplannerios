@@ -64,6 +64,23 @@ enum PlanningIntelligence {
         return GeneratedPlan(questions: questions, supplies: supplies, responsibilities: responsibilities)
     }
 
+    static func generateTimeline(for event: PartyEvent) -> [TimelineMoment] {
+        let calendar = Calendar.current
+        func offset(hours: Int, minutes: Int = 0) -> Date {
+            calendar.date(byAdding: DateComponents(hour: hours, minute: minutes), to: event.startsAt) ?? event.startsAt
+        }
+
+        return [
+            TimelineMoment(title: "Setup crew arrives", startsAt: offset(hours: -3), ownerID: event.ownerID, kind: .setup, notes: "Open venue, unload supplies, mark staging zones.", isCritical: true),
+            TimelineMoment(title: "Food prep starts", startsAt: offset(hours: -2), ownerID: event.meals.first?.ownerID, kind: .meal, notes: "Start prep, label allergens, confirm serving tools.", isCritical: true),
+            TimelineMoment(title: "Bar and beverages iced", startsAt: offset(hours: -1), ownerID: event.responsibilities.first(where: { $0.kind == .bar })?.ownerID, kind: .bar, notes: "Separate alcohol, soft drinks, water, and kids beverages.", isCritical: true),
+            TimelineMoment(title: "Guest arrival window", startsAt: event.startsAt, ownerID: event.ownerID, kind: .setup, notes: "Host greets, directions and parking questions handled.", isCritical: true),
+            TimelineMoment(title: "Meal service", startsAt: offset(hours: 1), ownerID: event.meals.first?.ownerID, kind: .meal, notes: "Serve main meal and keep backup supplies visible.", isCritical: true),
+            TimelineMoment(title: "Activities and music peak", startsAt: offset(hours: 2), ownerID: event.responsibilities.first(where: { $0.kind == .activities || $0.kind == .music })?.ownerID, kind: .activities, notes: "Run games, playlist, speeches, cake, or planned moments.", isCritical: false),
+            TimelineMoment(title: "Breakdown begins", startsAt: Calendar.current.date(byAdding: .minute, value: -45, to: event.endsAt) ?? event.endsAt, ownerID: event.responsibilities.first(where: { $0.kind == .breakdown })?.ownerID, kind: .breakdown, notes: "Trash, leftovers, rental returns, venue reset.", isCritical: true)
+        ]
+    }
+
     static func generateInsights(for event: PartyEvent) -> [PlanningInsight] {
         var insights: [PlanningInsight] = []
         let unassignedSupplies = event.supplies.filter { $0.assignedUserID == nil }
@@ -109,5 +126,44 @@ enum PlanningIntelligence {
         }
 
         return insights
+    }
+
+    static func recommendedActions(for event: PartyEvent) -> [SmartAction] {
+        var actions: [SmartAction] = []
+        let unanswered = event.invitations.filter { $0.status == .noResponse || $0.status == .invited }
+        let unassignedSupplies = event.supplies.filter { $0.assignedUserID == nil }
+        let unassignedResponsibilities = event.responsibilities.filter { $0.ownerID == event.ownerID && $0.kind != .setup }
+        let unpackedCriticalSupplies = event.supplies.filter { !$0.isPacked && [.bar, .meal, .setup, .breakdown].contains($0.category) }
+        let missingReceipts = event.expenses.filter { $0.receiptImageName == nil }
+
+        if !unanswered.isEmpty {
+            actions.append(SmartAction(kind: .invite, title: "Nudge \(unanswered.count) guests", detail: "Send a friendly RSVP reminder so food, drinks, chairs, and share math stay accurate.", priority: 100))
+        }
+
+        if !unassignedResponsibilities.isEmpty {
+            actions.append(SmartAction(kind: .assign, title: "Assign \(unassignedResponsibilities.count) owner-held jobs", detail: "Move work off the host before the event week gets noisy.", priority: 90))
+        }
+
+        if !unassignedSupplies.isEmpty {
+            actions.append(SmartAction(kind: .buy, title: "Assign \(unassignedSupplies.count) supply items", detail: "Every item should have a buyer, packer, or staging owner.", priority: 80))
+        }
+
+        if !unpackedCriticalSupplies.isEmpty {
+            actions.append(SmartAction(kind: .confirm, title: "Confirm critical supplies", detail: "\(unpackedCriticalSupplies.count) meal, bar, setup, or breakdown items are not packed yet.", priority: 70))
+        }
+
+        if !missingReceipts.isEmpty {
+            actions.append(SmartAction(kind: .collect, title: "Collect \(missingReceipts.count) receipts", detail: "Receipt capture keeps out-of-pocket totals and reimbursements trustworthy.", priority: 60))
+        }
+
+        if event.timeline.isEmpty {
+            actions.append(SmartAction(kind: .timeline, title: "Create run of show", detail: "Build the hour-by-hour event execution plan for helpers.", priority: 50))
+        }
+
+        if actions.isEmpty {
+            actions.append(SmartAction(kind: .communicate, title: "Share a confidence update", detail: "The plan is in strong shape. Post the latest arrival, parking, and responsibility reminders.", priority: 10))
+        }
+
+        return actions.sorted { $0.priority > $1.priority }
     }
 }

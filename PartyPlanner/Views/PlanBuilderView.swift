@@ -42,6 +42,29 @@ struct PlanBuilderView: View {
             }
 
             Section {
+                LinearMeter(
+                    title: "Budget Used",
+                    value: "\(store.expenseSummary.eventTotal.currencyText) of \(store.event.budget.targetTotal.currencyText)",
+                    ratio: store.budgetUsedRatio,
+                    color: store.budgetUsedRatio > 1 ? .red : .green
+                )
+                HStack {
+                    Label("Confirmed Headcount", systemImage: "person.2")
+                    Spacer()
+                    Text("\(store.confirmedHeadcount) of \(store.event.guestCount)")
+                        .foregroundStyle(.secondary)
+                }
+                HStack {
+                    Label("Timeline Moments", systemImage: "clock")
+                    Spacer()
+                    Text("\(store.event.timeline.count)")
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Label("Party Blueprint", systemImage: "rectangle.3.group")
+            }
+
+            Section {
                 ForEach(store.planningInsights) { insight in
                     InsightCard(insight: insight)
                 }
@@ -68,6 +91,14 @@ struct PlanBuilderView: View {
                 }
             } header: {
                 Label("Master Supply List", systemImage: "cart")
+            }
+
+            Section {
+                ForEach(store.sortedTimeline) { moment in
+                    TimelineMomentRow(moment: moment, ownerName: store.event.userName(for: moment.ownerID))
+                }
+            } header: {
+                Label("Run of Show", systemImage: "clock.badge.checkmark")
             }
         }
         .navigationTitle("Plan")

@@ -26,6 +26,10 @@ final class EventStore {
         ExpenseAllocator.summarize(event: event)
     }
 
+    var smartActions: [SmartAction] {
+        PlanningIntelligence.recommendedActions(for: event)
+    }
+
     var nextResponsibilities: [Responsibility] {
         event.responsibilities
             .filter { $0.status != .done }
@@ -53,11 +57,36 @@ final class EventStore {
         return min(100, max(0, Int((raw * 100).rounded())))
     }
 
+    var rsvpSummary: [RSVPStatus: Int] {
+        Dictionary(grouping: event.invitations, by: \.status)
+            .mapValues { invitations in invitations.reduce(0) { $0 + max($1.partySize, 1) } }
+    }
+
+    var confirmedHeadcount: Int {
+        event.invitations
+            .filter { $0.status == .yes }
+            .reduce(0) { $0 + max($1.partySize, 1) }
+    }
+
+    var budgetUsedRatio: Double {
+        guard event.budget.targetTotal > 0 else { return 0 }
+        let total = NSDecimalNumber(decimal: expenseSummary.eventTotal).doubleValue
+        let target = NSDecimalNumber(decimal: event.budget.targetTotal).doubleValue
+        return min(1.5, max(0, total / target))
+    }
+
+    var sortedTimeline: [TimelineMoment] {
+        event.timeline.sorted { $0.startsAt < $1.startsAt }
+    }
+
     func regenerateSuggestedPlan() {
         guard canEditMasterPlan else { return }
         let plan = PlanningIntelligence.generatePlan(for: event)
         event.supplies = merge(existing: event.supplies, suggestions: plan.supplies)
         event.responsibilities = merge(existing: event.responsibilities, suggestions: plan.responsibilities)
+        if event.timeline.isEmpty {
+            event.timeline = PlanningIntelligence.generateTimeline(for: event)
+        }
         setupQuestions = plan.questions
         publishUpdate("Regenerated the master plan from event details.")
     }

@@ -6,6 +6,17 @@ struct CrewView: View {
     var body: some View {
         List {
             Section {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                    MetricTile(title: "Going", value: "\(store.rsvpSummary[.yes, default: 0])", icon: "checkmark.circle", color: .green)
+                    MetricTile(title: "Maybe", value: "\(store.rsvpSummary[.maybe, default: 0])", icon: "questionmark.circle", color: .orange)
+                    MetricTile(title: "No Response", value: "\(store.rsvpSummary[.noResponse, default: 0] + store.rsvpSummary[.invited, default: 0])", icon: "paperplane", color: .blue)
+                    MetricTile(title: "Not Going", value: "\(store.rsvpSummary[.no, default: 0])", icon: "xmark.circle", color: .gray)
+                }
+            } header: {
+                Label("RSVP Confidence", systemImage: "person.2.wave.2")
+            }
+
+            Section {
                 ForEach(store.myResponsibilities) { item in
                     responsibilityRow(item, isMine: true)
                 }
@@ -28,8 +39,10 @@ struct CrewView: View {
             }
 
             Section {
-                ForEach(store.event.users) { user in
-                    contactRow(user)
+                ForEach(store.event.invitations) { invitation in
+                    if let user = store.event.users.first(where: { $0.id == invitation.userID }) {
+                        contactRow(user, invitation: invitation)
+                    }
                 }
             } header: {
                 Label("Guest & Helper Contacts", systemImage: "person.text.rectangle")
@@ -72,13 +85,24 @@ struct CrewView: View {
         .padding(.vertical, 6)
     }
 
-    private func contactRow(_ user: PartyUser) -> some View {
+    private func contactRow(_ user: PartyUser, invitation: GuestInvitation) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(user.name)
                     .font(.headline)
                 Spacer()
                 StatusPill(text: user.role.rawValue.capitalized, color: roleColor(user.role))
+            }
+            HStack {
+                StatusPill(text: invitation.status.rawValue, color: rsvpColor(invitation.status))
+                Text("Party of \(invitation.partySize)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if !invitation.dietaryNotes.isEmpty {
+                    Text(invitation.dietaryNotes)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
             Label(user.phone, systemImage: "phone")
                 .font(.caption)
@@ -96,6 +120,15 @@ struct CrewView: View {
         case .cohost: .purple
         case .helper: .blue
         case .guest: .gray
+        }
+    }
+
+    private func rsvpColor(_ status: RSVPStatus) -> Color {
+        switch status {
+        case .yes: .green
+        case .maybe: .orange
+        case .no: .gray
+        case .invited, .noResponse: .blue
         }
     }
 }

@@ -10,6 +10,7 @@ Supabase is the recommended backend for the first production version.
 - Realtime subscriptions for updates when someone changes a responsibility, receipt, note, or supply.
 - Storage buckets for receipt images and later event media.
 - Edge Functions for controlled operations such as invite creation, push notification fanout, Google Calendar sync, and AI plan generation.
+- Structured RSVP, budget, and run-of-show tables so planning intelligence can reason about headcount, timing, and spend.
 
 ## Setup Order
 
@@ -19,7 +20,7 @@ Supabase is the recommended backend for the first production version.
 4. Enable email auth first; add Sign in with Apple and Google later.
 5. Add the iOS Supabase Swift SDK in Xcode using Swift Package Manager.
 6. Store the Supabase URL and anon key in an app configuration file, not hard-coded in views.
-7. Turn on Realtime only for the tables the app needs live: `event_updates`, `notes`, `responsibilities`, `expenses`, and `supply_items`.
+7. Turn on Realtime only for the tables the app needs live: `event_updates`, `notes`, `responsibilities`, `expenses`, `supply_items`, `guest_invitations`, and `timeline_moments`.
 
 ## Recommended Edge Functions
 
@@ -45,4 +46,5 @@ Supabase is the recommended backend for the first production version.
 - Members can post public notes to their event board.
 - Private messages are visible only to sender and recipients.
 - Guests can see event details and public board content but cannot edit master planning data.
-
+- Guests can update their own RSVP details, party size, and dietary notes.
+- Owners/cohosts control event budget targets and the official run-of-show timeline.
