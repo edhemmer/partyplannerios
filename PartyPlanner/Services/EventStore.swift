@@ -15,7 +15,7 @@ final class EventStore {
     }
 
     var currentUser: PartyUser {
-        event.users.first { $0.id == currentUserID } ?? event.users[0]
+        event.users.first { $0.id == currentUserID } ?? .unknown
     }
 
     var canEditMasterPlan: Bool {
@@ -28,6 +28,32 @@ final class EventStore {
 
     var smartActions: [SmartAction] {
         PlanningIntelligence.recommendedActions(for: event)
+    }
+
+    var unpackedSupplyCount: Int {
+        event.supplies.filter { !$0.isPacked }.count
+    }
+
+    var missingReceiptCount: Int {
+        event.expenses.filter { $0.receiptImageName == nil }.count
+    }
+
+    var waitingOnRSVPHeadcount: Int {
+        rsvpSummary[.noResponse, default: 0] + rsvpSummary[.invited, default: 0]
+    }
+
+    var overdueResponsibilityCount: Int {
+        event.responsibilities.filter { responsibility in
+            responsibility.status != .done && responsibility.dueDate < .now
+        }.count
+    }
+
+    var eventTimingText: String {
+        let days = Calendar.current.dateComponents([.day], from: .now, to: event.startsAt).day ?? 0
+        if days > 1 { return "\(days) days out" }
+        if days == 1 { return "Tomorrow" }
+        if days == 0 { return "Today" }
+        return "In progress"
     }
 
     var trustScore: Int {
@@ -46,11 +72,7 @@ final class EventStore {
     var reliabilitySignals: [ReliabilitySignal] {
         var signals: [ReliabilitySignal] = []
         let minutesSinceSync = Calendar.current.dateComponents([.minute], from: event.syncStatus.lastSyncedAt, to: .now).minute ?? 0
-        let missingReceiptCount = event.expenses.filter { $0.receiptImageName == nil }.count
         let unassignedSupplyCount = event.supplies.filter { $0.assignedUserID == nil }.count
-        let staleResponsibilityCount = event.responsibilities.filter { responsibility in
-            responsibility.status != .done && responsibility.dueDate < .now
-        }.count
 
         signals.append(ReliabilitySignal(
             state: event.syncStatus.state == .live ? .verified : .warning,
@@ -83,9 +105,9 @@ final class EventStore {
         ))
 
         signals.append(ReliabilitySignal(
-            state: staleResponsibilityCount == 0 ? .verified : .warning,
+            state: overdueResponsibilityCount == 0 ? .verified : .warning,
             title: "Due Work",
-            detail: staleResponsibilityCount == 0 ? "No overdue responsibilities." : "\(staleResponsibilityCount) responsibilities are overdue."
+            detail: overdueResponsibilityCount == 0 ? "No overdue responsibilities." : "\(overdueResponsibilityCount) responsibilities are overdue."
         ))
 
         return signals

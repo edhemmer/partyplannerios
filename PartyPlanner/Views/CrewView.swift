@@ -18,7 +18,7 @@ struct CrewView: View {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     MetricTile(title: "Going", value: "\(store.rsvpSummary[.yes, default: 0])", icon: "checkmark.circle", color: .green)
                     MetricTile(title: "Maybe", value: "\(store.rsvpSummary[.maybe, default: 0])", icon: "questionmark.circle", color: .orange)
-                    MetricTile(title: "No Response", value: "\(store.rsvpSummary[.noResponse, default: 0] + store.rsvpSummary[.invited, default: 0])", icon: "paperplane", color: .blue)
+                    MetricTile(title: "No Response", value: "\(store.waitingOnRSVPHeadcount)", icon: "paperplane", color: .blue)
                     MetricTile(title: "Not Going", value: "\(store.rsvpSummary[.no, default: 0])", icon: "xmark.circle", color: .gray)
                 }
             } header: {

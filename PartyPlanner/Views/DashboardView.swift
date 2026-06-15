@@ -37,7 +37,7 @@ struct DashboardView: View {
                     Spacer()
                     Image(systemName: "party.popper.fill")
                         .font(.title2.weight(.bold))
-                        .symbolEffect(.bounce, options: .repeating.speed(0.28))
+                        .symbolEffect(.bounce, value: store.readinessScore)
                 }
                 .foregroundStyle(.white)
 
@@ -46,7 +46,7 @@ struct DashboardView: View {
                         .font(.system(size: 34, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(2)
-                    Text("\(store.event.guestCount) guests - \(store.event.ageGroup)")
+                    Text("\(store.eventTimingText) - \(store.event.guestCount) guests - \(store.event.ageGroup)")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.82))
                 }
@@ -85,7 +85,7 @@ struct DashboardView: View {
         return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
             MetricTile(title: "Open Work", value: "\(store.nextResponsibilities.count)", icon: "checklist", color: .green)
             MetricTile(title: "Confirmed", value: "\(store.confirmedHeadcount)", icon: "person.2.badge.gearshape", color: .orange)
-            MetricTile(title: "Unpacked", value: "\(store.event.supplies.filter { !$0.isPacked }.count)", icon: "cart", color: .cyan)
+            MetricTile(title: "Unpacked", value: "\(store.unpackedSupplyCount)", icon: "cart", color: .cyan)
             MetricTile(title: "Event Total", value: store.expenseSummary.eventTotal.currencyText, icon: "receipt", color: .pink)
         }
     }

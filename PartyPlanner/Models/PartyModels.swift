@@ -272,6 +272,10 @@ struct PartyUser: Identifiable, Hashable, Codable {
     var isAdult: Bool
 }
 
+extension PartyUser {
+    static let unknown = PartyUser(name: "Event Member", role: .guest, phone: "", email: "", isAdult: true)
+}
+
 struct GuestInvitation: Identifiable, Hashable, Codable {
     var id = UUID()
     var userID: PartyUser.ID
