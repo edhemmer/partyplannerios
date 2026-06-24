@@ -7,9 +7,12 @@
   --panel-strong: #fdfefe;
   --charcoal: #101114;
   --coral: #ff5a4f;
+  --rose: #ff7aa7;
   --teal: #13b7aa;
+  --mint: #71e7c8;
   --lime: #a8e43d;
   --cobalt: #2563ff;
+  --violet: #7c5cff;
   --amber: #ffb020;
   --danger: #e33b4f;
   --shadow: 0 18px 44px rgba(17, 19, 24, 0.10);
@@ -27,6 +30,8 @@ body {
   margin: 0;
   min-width: 320px;
   background:
+    radial-gradient(circle at 16% 18%, rgba(255, 90, 79, 0.10) 0 72px, transparent 73px),
+    radial-gradient(circle at 83% 12%, rgba(168, 228, 61, 0.14) 0 58px, transparent 59px),
     linear-gradient(120deg, rgba(37, 99, 255, 0.08), transparent 28%),
     linear-gradient(240deg, rgba(19, 183, 170, 0.12), transparent 26%),
     var(--soft);
@@ -48,7 +53,10 @@ button {
 
 .sidebar {
   width: 264px;
-  background: var(--charcoal);
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255, 90, 79, 0.22), transparent 24%),
+    radial-gradient(circle at 86% 62%, rgba(19, 183, 170, 0.18), transparent 28%),
+    var(--charcoal);
   color: #f7fafc;
   display: flex;
   flex-direction: column;
@@ -69,6 +77,7 @@ button {
 }
 
 .brand-mark {
+  position: relative;
   display: inline-grid;
   place-items: center;
   width: 38px;
@@ -77,6 +86,20 @@ button {
   background: linear-gradient(135deg, var(--coral), var(--lime));
   color: #111318;
   font-weight: 900;
+}
+
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--mint);
+  box-shadow:
+    -18px 34px 0 -3px var(--coral),
+    20px 25px 0 -4px var(--amber);
 }
 
 .brand strong,
@@ -128,8 +151,12 @@ button {
 
 .nav-item:hover,
 .nav-item.is-active {
-  background: rgba(255, 255, 255, 0.10);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.07));
   color: #fff;
+}
+
+.nav-item.is-active {
+  box-shadow: inset 3px 0 0 var(--mint);
 }
 
 svg {
@@ -151,7 +178,7 @@ svg {
 }
 
 .event-type {
-  color: var(--lime) !important;
+  color: var(--mint) !important;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 10px !important;
@@ -294,9 +321,38 @@ h1 {
   gap: 18px;
   align-items: stretch;
   background:
-    linear-gradient(135deg, rgba(255, 90, 79, 0.14), transparent 40%),
-    linear-gradient(45deg, rgba(37, 99, 255, 0.14), transparent 45%),
+    radial-gradient(circle at 96% 12%, rgba(168, 228, 61, 0.22) 0 48px, transparent 49px),
+    radial-gradient(circle at 60% 110%, rgba(255, 122, 167, 0.18) 0 88px, transparent 89px),
+    linear-gradient(135deg, rgba(255, 90, 79, 0.14), transparent 42%),
+    linear-gradient(45deg, rgba(37, 99, 255, 0.13), transparent 48%),
     #fff;
+}
+
+.party-spark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #d83f49;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.party-spark::before,
+.party-spark::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--amber);
+  transform: rotate(16deg);
+}
+
+.party-spark::after {
+  background: var(--teal);
+  transform: rotate(-18deg);
 }
 
 .hero-copy h2 {
@@ -321,11 +377,22 @@ h1 {
 }
 
 .metric {
-  background: rgba(248, 250, 252, 0.86);
+  position: relative;
+  background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(219, 226, 236, 0.9);
   border-radius: 8px;
   padding: 12px;
   min-width: 0;
+}
+
+.metric::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 3px;
+  border-radius: 99px;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--coral), var(--teal));
 }
 
 .metric span,
@@ -377,7 +444,7 @@ h1 {
 }
 
 .tabbar button.is-selected {
-  background: var(--charcoal);
+  background: linear-gradient(135deg, var(--charcoal), #242935);
   color: #fff;
 }
 
@@ -509,8 +576,8 @@ h1 {
   margin-left: auto;
   min-height: 28px;
   padding: 0 9px;
-  background: rgba(37, 99, 255, 0.10);
-  color: var(--cobalt);
+  background: rgba(255, 90, 79, 0.11);
+  color: #d83f49;
 }
 
 .shopping-row {
@@ -544,6 +611,7 @@ h1 {
   border-radius: 8px;
   padding: 16px;
   background:
+    radial-gradient(circle at 98% 0, rgba(168, 228, 61, 0.22) 0 44px, transparent 45px),
     linear-gradient(160deg, rgba(19, 183, 170, 0.10), transparent 38%),
     #fff;
 }
@@ -614,7 +682,7 @@ h1 {
   width: 10px;
   height: 10px;
   border-radius: 99px;
-  background: var(--coral);
+  background: linear-gradient(135deg, var(--coral), var(--amber));
 }
 
 .meal-detail {

@@ -144,22 +144,22 @@ export function trustSignals(event) {
   const totals = eventTotals(event);
   const signals = [
     {
-      label: "Backend contract",
-      value: "Ready to wire",
+      label: "Shared plan",
+      value: "Ready",
       tone: "good",
-      detail: "Supabase adapter boundary is isolated from UI."
+      detail: "Web and iOS are pointed at the same source of truth."
     },
     {
-      label: "Offline safety",
-      value: `${event.sync.pendingChanges} queued`,
+      label: "Low-signal mode",
+      value: `${event.sync.pendingChanges} saved`,
       tone: event.sync.pendingChanges ? "warn" : "good",
-      detail: "Changes persist locally before sync."
+      detail: "Updates are kept here until the signal comes back."
     },
     {
       label: "Receipts",
       value: totals.receiptsMissing ? `${totals.receiptsMissing} missing` : "Complete",
       tone: totals.receiptsMissing ? "warn" : "good",
-      detail: "Require review before settlement."
+      detail: "Review them before everyone settles up."
     },
     {
       label: "Budget",

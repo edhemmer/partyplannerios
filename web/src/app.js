@@ -28,7 +28,7 @@ function setEvent(next, mutationType, payload = {}) {
     sync: {
       ...next.sync,
       pendingChanges: listQueue().length + 1,
-      lastSyncedAt: "queued locally"
+      lastSyncedAt: "saved on this device"
     }
   };
   saveEvent(event);
@@ -85,7 +85,7 @@ function sidebar() {
         <span class="brand-mark">P</span>
         <span>
           <strong>Party Planner</strong>
-          <small>Organizer Command</small>
+          <small>Host Studio</small>
         </span>
       </a>
       <nav class="nav-list">
@@ -108,8 +108,8 @@ function sidebar() {
       <div class="offline-card">
         <span class="pulse"></span>
         <div>
-          <strong>Offline-first</strong>
-          <span>${event.sync.pendingChanges} local updates queued</span>
+          <strong>Low-signal ready</strong>
+          <span>${event.sync.pendingChanges} saved updates waiting</span>
         </div>
       </div>
     </aside>
@@ -147,12 +147,13 @@ function heroCommand(totals, score) {
   return `
     <section class="command-hero">
       <div class="hero-copy">
-        <h2>Run the whole party from one clear command surface.</h2>
-        <p>Owner-controlled setup, helper-owned updates, offline-safe changes, and deterministic food, supply, lodging, and money logic.</p>
+        <span class="party-spark">Tonight's plan, beautifully under control</span>
+        <h2>Keep the party moving without chasing everyone down.</h2>
+        <p>Plan the food, supplies, rooms, money, helpers, and day-of timing in one lively workspace that still behaves like a serious organizer.</p>
       </div>
       <div class="metric-strip" aria-label="Event readiness">
         ${metric("Readiness", `${totals.progress}%`, "Tasks + supplies")}
-        ${metric("Trust", `${score}`, "Realtime score")}
+        ${metric("Confidence", `${score}`, "Fresh plan check")}
         ${metric("Planned", money(totals.planTotal), "Meals, supplies, lodging")}
         ${metric("Budget", money(totals.remainingBudget), totals.remainingBudget >= 0 ? "Remaining" : "Over")}
       </div>
@@ -162,10 +163,10 @@ function heroCommand(totals, score) {
 
 function panelTabs() {
   const tabs = [
-    ["command", "Run board"],
-    ["meals", "Meal intelligence"],
-    ["money", "Expense control"],
-    ["crew", "Crew ownership"]
+    ["command", "Party board"],
+    ["meals", "Food flow"],
+    ["money", "Money table"],
+    ["crew", "People"]
   ];
   return `
     <div class="tabbar" role="tablist">
@@ -202,9 +203,9 @@ function commandPanel(shopping, selectedMeal) {
                   </label>
                   <div>
                     <strong>${task.title}</strong>
-                    <p>${task.kind} · due ${task.due} · ${owner?.name ?? "Unassigned"}</p>
+                    <p>${task.kind} &middot; due ${task.due} &middot; ${owner?.name ?? "Unassigned"}</p>
                   </div>
-                  <button class="tiny-button" data-action="select-user" data-user="${task.ownerId}">Owner</button>
+                  <button class="tiny-button" data-action="select-user" data-user="${task.ownerId}">Person</button>
                 </li>
               `;
             })
@@ -213,7 +214,7 @@ function commandPanel(shopping, selectedMeal) {
       </section>
       <section class="shopping-panel">
         <div class="section-heading">
-          <h3>Live shopping merge</h3>
+          <h3>Smart shopping list</h3>
           <span>${shopping.length} lines</span>
         </div>
         <div class="shopping-list">
@@ -230,7 +231,7 @@ function commandPanel(shopping, selectedMeal) {
                   </label>
                   <div>
                     <strong>${line.name}</strong>
-                    <p>${line.quantity} ${line.unit} · ${line.category}${shared ? " · merged across meals" : ""}</p>
+                    <p>${line.quantity} ${line.unit} &middot; ${line.category}${shared ? " &middot; merged across meals" : ""}</p>
                   </div>
                   ${avatar(owner)}
                 </article>
@@ -256,7 +257,7 @@ function mealsPanel(selectedMeal) {
       <section>
         <div class="section-heading">
           <h3>Meals</h3>
-          <span>${event.adults} adults · ${event.children} kids</span>
+          <span>${event.adults} adults &middot; ${event.children} kids</span>
         </div>
         <div class="meal-list">
           ${event.meals
@@ -267,7 +268,7 @@ function mealsPanel(selectedMeal) {
                   <span class="service-dot"></span>
                   <span>
                     <strong>${meal.title}</strong>
-                    <small>${meal.day} · ${meal.time} · ${owner?.name ?? "Unassigned"}</small>
+                    <small>${meal.day} &middot; ${meal.time} &middot; ${owner?.name ?? "Unassigned"}</small>
                   </span>
                   <em>${money(meal.estimatedCost)}</em>
                 </button>
@@ -289,13 +290,13 @@ function mealScaleCard(meal) {
     <div class="scale-card">
       <div class="scale-header">
         <div>
-          <p>${meal.service} · ${meal.day} ${meal.time}</p>
+          <p>${meal.service} &middot; ${meal.day} ${meal.time}</p>
           <h4>${meal.title}</h4>
         </div>
         ${avatar(personById(event, meal.ownerId))}
       </div>
       <div class="equipment-grid">
-        ${metric("Prep", `${Math.max(35, items.length * 18)}m`, "Estimated")}
+        ${metric("Prep", `${Math.max(35, items.length * 18)}m`, "Kitchen rhythm")}
         ${metric("Pans", `${Math.max(2, Math.ceil(event.guestCount / 12))}`, "Sheet pans")}
         ${metric("Buffer", `${meal.buffer}%`, "Extra quantity")}
       </div>
@@ -324,7 +325,7 @@ function moneyPanel(totals) {
     <div class="money-layout">
       <section>
         <div class="section-heading">
-          <h3>Expense ledger</h3>
+          <h3>Money table</h3>
           <span>${money(totals.expenses)} captured</span>
         </div>
         <div class="expense-list">
@@ -336,7 +337,7 @@ function moneyPanel(totals) {
                   ${avatar(payer)}
                   <div>
                     <strong>${expense.title}</strong>
-                    <p>${expense.category} · ${expense.split} · ${expense.receipt ? "receipt attached" : "needs receipt"}</p>
+                    <p>${expense.category} &middot; ${expense.split} &middot; ${expense.receipt ? "receipt attached" : "needs receipt"}</p>
                   </div>
                   <em>${money(expense.amount)}</em>
                 </article>
@@ -347,8 +348,8 @@ function moneyPanel(totals) {
       </section>
       <section>
         <div class="section-heading">
-          <h3>Settlement preview</h3>
-          <span>adult split</span>
+          <h3>Who owes what</h3>
+          <span>adult share</span>
         </div>
         <div class="balance-list">
           ${balances
@@ -358,7 +359,7 @@ function moneyPanel(totals) {
                   ${avatar(row.person)}
                   <span>
                     <strong>${row.person.name}</strong>
-                    <small>Paid ${money(row.paid)} · owes ${money(row.owes)}</small>
+                    <small>Paid ${money(row.paid)} &middot; owes ${money(row.owes)}</small>
                   </span>
                   <em class="${row.net >= 0 ? "positive" : "negative"}">${row.net >= 0 ? "+" : ""}${money(row.net)}</em>
                 </article>
@@ -384,7 +385,7 @@ function crewPanel() {
               ${avatar(person)}
               <span>
                 <strong>${person.name}</strong>
-                <small>${person.role} · ${person.phone}</small>
+                <small>${person.role} &middot; ${person.phone}</small>
               </span>
               <em>${taskCount + supplyCount + mealCount} owned</em>
             </button>
@@ -406,7 +407,7 @@ function inspector(user, trust, totals, queue) {
         ${avatar(user, "large")}
       </div>
       <h2>${user.name}</h2>
-      <p>${user.role} · can update owned responsibilities, receipts, notes, and assigned meal ingredients.</p>
+      <p>${user.role} &middot; can update their own jobs, receipts, notes, and assigned meal ingredients.</p>
       <div class="ownership-grid">
         ${metric("Tasks", mineTasks.length, "assigned")}
         ${metric("Meals", mineMeals.length, "owned")}
@@ -416,7 +417,7 @@ function inspector(user, trust, totals, queue) {
     <section class="inspector-card trust-card">
       <div class="score-ring" style="--score:${trust.score}">
         <strong>${trust.score}</strong>
-        <span>trust</span>
+        <span>ready</span>
       </div>
       <div class="signal-list">
         ${trust.signals
@@ -436,7 +437,7 @@ function inspector(user, trust, totals, queue) {
     </section>
     <section class="inspector-card">
       <div class="section-heading compact">
-        <h3>Sync queue</h3>
+        <h3>Saved for later</h3>
         <span>${queue.length}</span>
       </div>
       <div class="queue-list">
@@ -447,13 +448,13 @@ function inspector(user, trust, totals, queue) {
                 .reverse()
                 .map((item) => `<p><strong>${item.type}</strong><span>${new Date(item.createdAt).toLocaleTimeString()}</span></p>`)
                 .join("")
-            : "<p><strong>No pending changes</strong><span>Ready</span></p>"
+            : "<p><strong>Everything is caught up</strong><span>Ready</span></p>"
         }
       </div>
     </section>
     <section class="inspector-card venue-card">
       <div class="section-heading compact">
-        <h3>Venue</h3>
+        <h3>Getting there</h3>
         <span>Maps ready</span>
       </div>
       <p>${event.address}</p>
