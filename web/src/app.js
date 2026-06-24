@@ -73,10 +73,10 @@ function render() {
 
 function sidebar() {
   const nav = [
-    ["command", "Command", "bolt"],
-    ["meals", "Meals", "utensils"],
-    ["money", "Money", "receipt"],
-    ["crew", "Crew", "users"]
+    ["command", "Home base", "bolt"],
+    ["meals", "Food", "utensils"],
+    ["money", "Costs", "receipt"],
+    ["crew", "People", "users"]
   ];
 
   return `
@@ -131,7 +131,7 @@ function topbar(totals, queued) {
         </label>
         <button class="sync-button" data-action="sync">
           ${iconSvg("cloud")}
-          <span>${queued ? `${queued} queued` : "Synced"}</span>
+          <span>${queued ? `${queued} saved` : "All caught up"}</span>
         </button>
         <button class="reset-button" data-action="reset">Reset demo</button>
       </div>
@@ -152,7 +152,7 @@ function heroCommand(totals, score) {
         <p>Plan the food, supplies, rooms, money, helpers, and day-of timing in one lively workspace that still behaves like a serious organizer.</p>
       </div>
       <div class="metric-strip" aria-label="Event readiness">
-        ${metric("Readiness", `${totals.progress}%`, "Tasks + supplies")}
+        ${metric("Party ready", `${totals.progress}%`, "Tasks + supplies")}
         ${metric("Confidence", `${score}`, "Fresh plan check")}
         ${metric("Planned", money(totals.planTotal), "Meals, supplies, lodging")}
         ${metric("Budget", money(totals.remainingBudget), totals.remainingBudget >= 0 ? "Remaining" : "Over")}
@@ -188,8 +188,8 @@ function commandPanel(shopping, selectedMeal) {
     <div class="split-layout">
       <section class="timeline-panel">
         <div class="section-heading">
-          <h3>Next best actions</h3>
-          <span>${event.tasks.filter((task) => !task.done).length} open</span>
+          <h3>What needs a nudge</h3>
+          <span>${event.tasks.filter((task) => !task.done).length} to finish</span>
         </div>
         <ol class="action-list">
           ${event.tasks
@@ -205,7 +205,7 @@ function commandPanel(shopping, selectedMeal) {
                     <strong>${task.title}</strong>
                     <p>${task.kind} &middot; due ${task.due} &middot; ${owner?.name ?? "Unassigned"}</p>
                   </div>
-                  <button class="tiny-button" data-action="select-user" data-user="${task.ownerId}">Person</button>
+                  <button class="tiny-button" data-action="select-user" data-user="${task.ownerId}">Who</button>
                 </li>
               `;
             })
@@ -214,8 +214,8 @@ function commandPanel(shopping, selectedMeal) {
       </section>
       <section class="shopping-panel">
         <div class="section-heading">
-          <h3>Smart shopping list</h3>
-          <span>${shopping.length} lines</span>
+          <h3>Shopping that stays sane</h3>
+          <span>${shopping.length} items</span>
         </div>
         <div class="shopping-list">
           ${shopping
@@ -231,7 +231,7 @@ function commandPanel(shopping, selectedMeal) {
                   </label>
                   <div>
                     <strong>${line.name}</strong>
-                    <p>${line.quantity} ${line.unit} &middot; ${line.category}${shared ? " &middot; merged across meals" : ""}</p>
+                    <p>${line.quantity} ${line.unit} &middot; ${line.category}${shared ? " &middot; shared by meals" : ""}</p>
                   </div>
                   ${avatar(owner)}
                 </article>
@@ -256,7 +256,7 @@ function mealsPanel(selectedMeal) {
     <div class="meal-layout">
       <section>
         <div class="section-heading">
-          <h3>Meals</h3>
+          <h3>Food plan</h3>
           <span>${event.adults} adults &middot; ${event.children} kids</span>
         </div>
         <div class="meal-list">
@@ -297,8 +297,8 @@ function mealScaleCard(meal) {
       </div>
       <div class="equipment-grid">
         ${metric("Prep", `${Math.max(35, items.length * 18)}m`, "Kitchen rhythm")}
-        ${metric("Pans", `${Math.max(2, Math.ceil(event.guestCount / 12))}`, "Sheet pans")}
-        ${metric("Buffer", `${meal.buffer}%`, "Extra quantity")}
+        ${metric("Pans", `${Math.max(2, Math.ceil(event.guestCount / 12))}`, "Cooking gear")}
+        ${metric("Buffer", `${meal.buffer}%`, "Just enough extra")}
       </div>
       <ul class="ingredient-list">
         ${items
@@ -326,7 +326,7 @@ function moneyPanel(totals) {
       <section>
         <div class="section-heading">
           <h3>Money table</h3>
-          <span>${money(totals.expenses)} captured</span>
+          <span>${money(totals.expenses)} logged</span>
         </div>
         <div class="expense-list">
           ${event.expenses
@@ -407,7 +407,7 @@ function inspector(user, trust, totals, queue) {
         ${avatar(user, "large")}
       </div>
       <h2>${user.name}</h2>
-      <p>${user.role} &middot; can update their own jobs, receipts, notes, and assigned meal ingredients.</p>
+      <p>${user.role} &middot; sees what they own and can update their pieces without touching the master plan.</p>
       <div class="ownership-grid">
         ${metric("Tasks", mineTasks.length, "assigned")}
         ${metric("Meals", mineMeals.length, "owned")}

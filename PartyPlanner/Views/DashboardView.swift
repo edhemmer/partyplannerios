@@ -21,7 +21,7 @@ struct DashboardView: View {
             .padding()
         }
         .background(PartyTheme.frost)
-        .navigationTitle("Party Command")
+        .navigationTitle("Host Studio")
     }
 
     private var hero: some View {
@@ -62,13 +62,13 @@ struct DashboardView: View {
                 ViewThatFits(in: .horizontal) {
                     HStack {
                         StatusPill(text: "\(store.readinessScore)% ready", color: readinessColor)
-                        StatusPill(text: "\(store.trustScore)% trusted", color: trustColor)
+                        StatusPill(text: "\(store.trustScore)% confidence", color: trustColor)
                         StatusPill(text: store.canEditMasterPlan ? "Organizer" : "Helper", color: .blue)
                     }
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             StatusPill(text: "\(store.readinessScore)% ready", color: readinessColor)
-                            StatusPill(text: "\(store.trustScore)% trusted", color: trustColor)
+                            StatusPill(text: "\(store.trustScore)% confidence", color: trustColor)
                         }
                         StatusPill(text: store.canEditMasterPlan ? "Organizer" : "Helper", color: .blue)
                     }
@@ -92,10 +92,10 @@ struct DashboardView: View {
 
     private var liveTrust: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Live Trust", icon: "shield.checkered", color: .green)
+            SectionHeader(title: "Plan Confidence", icon: "shield.checkered", color: .green)
             HStack(spacing: 12) {
                 MetricTile(title: "Sync", value: store.event.syncStatus.state.rawValue, icon: store.event.syncStatus.state.icon, color: store.event.syncStatus.state.color)
-                MetricTile(title: "Trust Score", value: "\(store.trustScore)%", icon: "checkmark.shield", color: trustColor)
+                MetricTile(title: "Confidence", value: "\(store.trustScore)%", icon: "checkmark.shield", color: trustColor)
             }
             ForEach(store.reliabilitySignals.prefix(3)) { signal in
                 ReliabilitySignalCard(signal: signal)
@@ -111,7 +111,7 @@ struct DashboardView: View {
 
     private var smartActions: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Next Best Actions", icon: "sparkles", color: .orange)
+            SectionHeader(title: "What Needs a Nudge", icon: "sparkles", color: .orange)
             if store.smartActions.isEmpty {
                 PremiumEmptyState(title: "Everything looks calm", detail: "No urgent host actions are waiting right now.", icon: "checkmark.seal.fill", color: PartyTheme.leaf)
             } else {
@@ -124,7 +124,7 @@ struct DashboardView: View {
 
     private var intelligence: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Intelligence", icon: "brain.head.profile", color: .purple)
+            SectionHeader(title: "Helpful Checks", icon: "brain.head.profile", color: .purple)
             ForEach(store.planningInsights.prefix(3)) { insight in
                 InsightCard(insight: insight)
             }
@@ -133,7 +133,7 @@ struct DashboardView: View {
 
     private var runOfShow: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Run of Show", icon: "clock.badge.checkmark", color: .indigo)
+            SectionHeader(title: "Party Timeline", icon: "clock.badge.checkmark", color: .indigo)
             ForEach(store.sortedTimeline.prefix(4)) { moment in
                 TimelineMomentRow(moment: moment, ownerName: store.event.userName(for: moment.ownerID))
             }
@@ -142,7 +142,7 @@ struct DashboardView: View {
 
     private var priorityWork: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Priority Work", icon: "bolt", color: .blue)
+            SectionHeader(title: "Who Owns What", icon: "bolt", color: .blue)
             if store.nextResponsibilities.isEmpty {
                 PremiumEmptyState(title: "No open work", detail: "All responsibilities are marked done or ready.", icon: "checkmark.circle.fill", color: PartyTheme.leaf)
             } else {
@@ -172,7 +172,7 @@ struct DashboardView: View {
 
     private var updates: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionHeader(title: "Live Updates", icon: "bell.badge", color: .pink)
+            SectionHeader(title: "Latest From the Crew", icon: "bell.badge", color: .pink)
             if store.event.updates.isEmpty {
                 PremiumEmptyState(title: "No updates yet", detail: "Board posts and responsibility changes will appear here.", icon: "bell", color: PartyTheme.ember)
             } else {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
-    case command = "Command"
+    case command = "Home"
     case plan = "Plan"
     case crew = "Crew"
     case money = "Money"
