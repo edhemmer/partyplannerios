@@ -60,6 +60,8 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `docs/PRODUCTION_TRUST_CORPUS.md` defines accuracy, reliability, and launch-stability expectations.
 - `docs/RELEASE_READINESS.md` defines build, data, UX, and launch gates.
 - `docs/WEB_COMPANION_REVIEW.md` reviews the related web prototype and identifies what should be ported or kept separate.
+- `docs/WEB_IOS_SHARED_ARCHITECTURE.md` defines how the native app, web companion, Supabase, offline sync, and shared planning logic fit together.
+- `web` contains the production-oriented web companion shell for organizer-heavy planning and future Supabase wiring.
 - `PartyPlanner/Fixtures` contains a realistic sample event for previews and local development.
 
 ## Implementation Status

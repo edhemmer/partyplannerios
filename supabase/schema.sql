@@ -10,6 +10,8 @@ create type public.note_visibility as enum ('event_board', 'private_message', 'o
 create type public.rsvp_status as enum ('invited', 'yes', 'maybe', 'no', 'no_response');
 create type public.sync_connection_state as enum ('live', 'syncing', 'offline', 'degraded');
 create type public.audit_action as enum ('created_plan', 'regenerated_plan', 'updated_responsibility', 'added_expense', 'posted_note', 'resolved_conflict', 'synced');
+create type public.shopping_source_kind as enum ('meal_item', 'supply_item', 'staple');
+create type public.notification_kind as enum ('assignment_changed', 'meal_updated', 'shopping_updated', 'expense_updated', 'note_posted', 'sync_conflict');
 
 create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -151,6 +153,11 @@ create table public.meal_items (
   name text not null,
   quantity numeric(12,2) not null check (quantity >= 0),
   unit text not null default 'count',
+  per_adult_quantity numeric(12,3) check (per_adult_quantity is null or per_adult_quantity >= 0),
+  per_child_quantity numeric(12,3) check (per_child_quantity is null or per_child_quantity >= 0),
+  fixed_quantity numeric(12,3) check (fixed_quantity is null or fixed_quantity >= 0),
+  buffer_percent integer not null default 0 check (buffer_percent between 0 and 100),
+  category text not null default 'other',
   item_type text not null check (item_type in ('ingredient', 'equipment')),
   is_packed boolean not null default false
 );
@@ -186,6 +193,105 @@ create table public.expense_splits (
   profile_id uuid not null references public.profiles(id) on delete cascade,
   share_amount numeric(12,2) check (share_amount >= 0),
   primary key (expense_id, profile_id)
+);
+
+create table public.lodgings (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null unique references public.events(id) on delete cascade,
+  name text not null,
+  address text not null default '',
+  booked_by_profile_id uuid references public.profiles(id) on delete set null,
+  total_amount numeric(12,2) not null default 0 check (total_amount >= 0),
+  notes text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.lodging_rooms (
+  id uuid primary key default gen_random_uuid(),
+  lodging_id uuid not null references public.lodgings(id) on delete cascade,
+  name text not null,
+  capacity integer not null default 2 check (capacity > 0),
+  price_amount numeric(12,2) not null default 0 check (price_amount >= 0),
+  payer_profile_id uuid references public.profiles(id) on delete set null,
+  occupant_profile_ids uuid[] not null default '{}',
+  position integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.shopping_lines (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  name text not null,
+  quantity numeric(12,2) not null check (quantity >= 0),
+  unit text not null default 'count',
+  category text not null default 'other',
+  assigned_profile_id uuid references public.profiles(id) on delete set null,
+  estimated_amount numeric(12,2) check (estimated_amount is null or estimated_amount >= 0),
+  store_name text not null default '',
+  is_purchased boolean not null default false,
+  is_system_generated boolean not null default true,
+  split_policy public.split_policy not null default 'equal',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.shopping_line_sources (
+  shopping_line_id uuid not null references public.shopping_lines(id) on delete cascade,
+  source_kind public.shopping_source_kind not null,
+  source_id uuid,
+  quantity numeric(12,2) not null default 0 check (quantity >= 0),
+  primary key (shopping_line_id, source_kind, source_id)
+);
+
+create table public.staple_definitions (
+  id uuid primary key default gen_random_uuid(),
+  stable_key text not null unique,
+  name text not null,
+  category text not null,
+  unit text not null default 'count',
+  default_enabled boolean not null default true,
+  formula jsonb not null default '{}'::jsonb,
+  version integer not null default 1,
+  created_at timestamptz not null default now()
+);
+
+create table public.event_templates (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references public.profiles(id) on delete cascade,
+  source_event_id uuid references public.events(id) on delete set null,
+  title text not null,
+  preset public.event_preset not null default 'custom',
+  snapshot jsonb not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table public.sync_mutations (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  actor_id uuid not null references public.profiles(id) on delete restrict,
+  client_mutation_id text not null,
+  mutation_type text not null,
+  payload jsonb not null default '{}'::jsonb,
+  status text not null default 'queued' check (status in ('queued', 'applied', 'rejected', 'conflict')),
+  created_at timestamptz not null default now(),
+  applied_at timestamptz,
+  unique (actor_id, client_mutation_id)
+);
+
+create table public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  event_id uuid not null references public.events(id) on delete cascade,
+  recipient_id uuid not null references public.profiles(id) on delete cascade,
+  actor_id uuid references public.profiles(id) on delete set null,
+  kind public.notification_kind not null,
+  title text not null,
+  body text not null default '',
+  target_path text not null default '',
+  read_at timestamptz,
+  created_at timestamptz not null default now()
 );
 
 create table public.notes (
@@ -274,6 +380,17 @@ create index supply_items_assigned_profile_id_idx on public.supply_items(assigne
 create index expenses_event_id_idx on public.expenses(event_id);
 create index expenses_paid_by_profile_id_idx on public.expenses(paid_by_profile_id);
 create index expense_splits_profile_id_idx on public.expense_splits(profile_id);
+create index lodgings_event_id_idx on public.lodgings(event_id);
+create index lodging_rooms_lodging_id_idx on public.lodging_rooms(lodging_id);
+create index lodging_rooms_payer_profile_id_idx on public.lodging_rooms(payer_profile_id);
+create index shopping_lines_event_id_idx on public.shopping_lines(event_id);
+create index shopping_lines_assigned_profile_id_idx on public.shopping_lines(assigned_profile_id);
+create index shopping_line_sources_source_idx on public.shopping_line_sources(source_kind, source_id);
+create index event_templates_owner_id_idx on public.event_templates(owner_id);
+create index sync_mutations_event_id_created_at_idx on public.sync_mutations(event_id, created_at desc);
+create index sync_mutations_actor_id_idx on public.sync_mutations(actor_id);
+create index notifications_recipient_id_created_at_idx on public.notifications(recipient_id, created_at desc);
+create index notifications_event_id_idx on public.notifications(event_id);
 create index notes_event_id_idx on public.notes(event_id);
 create index notes_author_id_idx on public.notes(author_id);
 create index note_recipients_profile_id_idx on public.note_recipients(profile_id);
@@ -295,6 +412,14 @@ alter table public.meal_items enable row level security;
 alter table public.supply_items enable row level security;
 alter table public.expenses enable row level security;
 alter table public.expense_splits enable row level security;
+alter table public.lodgings enable row level security;
+alter table public.lodging_rooms enable row level security;
+alter table public.shopping_lines enable row level security;
+alter table public.shopping_line_sources enable row level security;
+alter table public.staple_definitions enable row level security;
+alter table public.event_templates enable row level security;
+alter table public.sync_mutations enable row level security;
+alter table public.notifications enable row level security;
 alter table public.notes enable row level security;
 alter table public.note_recipients enable row level security;
 alter table public.event_updates enable row level security;
@@ -607,6 +732,125 @@ create policy expense_splits_delete_managers on public.expense_splits
         and (select public.can_manage_event(e.event_id))
     )
   );
+
+create policy lodgings_select_members on public.lodgings
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy lodgings_write_managers on public.lodgings
+  for all
+  using ((select public.can_manage_event(event_id)))
+  with check ((select public.can_manage_event(event_id)));
+
+create policy lodging_rooms_select_members on public.lodging_rooms
+  for select
+  using (
+    exists (
+      select 1 from public.lodgings l
+      where l.id = lodging_id
+        and (select public.is_event_member(l.event_id))
+    )
+  );
+
+create policy lodging_rooms_write_managers on public.lodging_rooms
+  for all
+  using (
+    exists (
+      select 1 from public.lodgings l
+      where l.id = lodging_id
+        and (select public.can_manage_event(l.event_id))
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.lodgings l
+      where l.id = lodging_id
+        and (select public.can_manage_event(l.event_id))
+    )
+  );
+
+create policy shopping_lines_select_members on public.shopping_lines
+  for select
+  using ((select public.is_event_member(event_id)));
+
+create policy shopping_lines_insert_managers on public.shopping_lines
+  for insert
+  with check ((select public.can_manage_event(event_id)));
+
+create policy shopping_lines_update_assignee_or_manager on public.shopping_lines
+  for update
+  using ((select public.can_manage_event(event_id)) or assigned_profile_id = (select auth.uid()))
+  with check ((select public.can_manage_event(event_id)) or assigned_profile_id = (select auth.uid()));
+
+create policy shopping_lines_delete_managers on public.shopping_lines
+  for delete
+  using ((select public.can_manage_event(event_id)));
+
+create policy shopping_line_sources_select_members on public.shopping_line_sources
+  for select
+  using (
+    exists (
+      select 1 from public.shopping_lines sl
+      where sl.id = shopping_line_id
+        and (select public.is_event_member(sl.event_id))
+    )
+  );
+
+create policy shopping_line_sources_write_managers on public.shopping_line_sources
+  for all
+  using (
+    exists (
+      select 1 from public.shopping_lines sl
+      where sl.id = shopping_line_id
+        and (select public.can_manage_event(sl.event_id))
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.shopping_lines sl
+      where sl.id = shopping_line_id
+        and (select public.can_manage_event(sl.event_id))
+    )
+  );
+
+create policy staple_definitions_select_authenticated on public.staple_definitions
+  for select
+  using ((select auth.uid()) is not null);
+
+create policy event_templates_select_owner on public.event_templates
+  for select
+  using (owner_id = (select auth.uid()));
+
+create policy event_templates_write_owner on public.event_templates
+  for all
+  using (owner_id = (select auth.uid()))
+  with check (owner_id = (select auth.uid()));
+
+create policy sync_mutations_select_actor_or_manager on public.sync_mutations
+  for select
+  using (actor_id = (select auth.uid()) or (select public.can_manage_event(event_id)));
+
+create policy sync_mutations_insert_members_self on public.sync_mutations
+  for insert
+  with check ((select public.is_event_member(event_id)) and actor_id = (select auth.uid()));
+
+create policy sync_mutations_update_managers on public.sync_mutations
+  for update
+  using ((select public.can_manage_event(event_id)))
+  with check ((select public.can_manage_event(event_id)));
+
+create policy notifications_select_recipient on public.notifications
+  for select
+  using (recipient_id = (select auth.uid()));
+
+create policy notifications_insert_event_members on public.notifications
+  for insert
+  with check ((select public.is_event_member(event_id)));
+
+create policy notifications_update_recipient_read_state on public.notifications
+  for update
+  using (recipient_id = (select auth.uid()))
+  with check (recipient_id = (select auth.uid()));
 
 create policy notes_select_visible on public.notes
   for select
