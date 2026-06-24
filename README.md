@@ -59,6 +59,7 @@ The goal is not to make users browse data. The app should always answer: what ma
 - `docs/MARKET_REVIEW.md` captures market gaps and product differentiation without naming competitors.
 - `docs/PRODUCTION_TRUST_CORPUS.md` defines accuracy, reliability, and launch-stability expectations.
 - `docs/RELEASE_READINESS.md` defines build, data, UX, and launch gates.
+- `docs/WEB_COMPANION_REVIEW.md` reviews the related web prototype and identifies what should be ported or kept separate.
 - `PartyPlanner/Fixtures` contains a realistic sample event for previews and local development.
 
 ## Implementation Status

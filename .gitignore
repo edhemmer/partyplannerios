@@ -18,3 +18,5 @@ GoogleService-Info.plist
 # macOS
 .DS_Store
 
+# Local Codex review worktrees
+.codex/
